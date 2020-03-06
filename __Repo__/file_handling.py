@@ -10,7 +10,7 @@ https://www.geeksforgeeks.org/os-walk-python/
 """
 
 def findFile(fileName):
-    for root, dirs, files in os.walk("..", topdown=True):
+    for root, dirs, files in os.walk("../../", topdown=True):
         if fileName in files:
             return os.path.join(root, fileName)
     # If file is not found:
