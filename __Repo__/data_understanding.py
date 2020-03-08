@@ -11,31 +11,46 @@ from collections import defaultdict
 def main():
     df = pd.read_csv('file')
 
-    print('Primi Valori del Dataset:')
-    df.head()
-    print('Ultimi Valori del Dataset:')
-    df.tail()
-    print('Dimensioni del Dataset:\n',
-            'Numero di Oggetti: {}'.format(df.shape[0]), '\n',
-            'Numero di Attributi: {}'.format(df.shape[1]))
-    print('Data Types degli Attributi:')
-    df.dtypes
-    print('Numero di Valori Nulli degli Attributi:')
-    df.isnull().sum()
-    print('Numero di Valori pari a 0 degli Attributi:')
-    (df == 0).sum(axis=0)
+    dfHead, dfTail, *other = dataset_state(df)
+    dfHead
+
+    statistics, pearson_corr, spearman_corr, kendall_corr = numeric_columns_stats(df)
+    spearman_corr
 
 
+def dataset_state(df):
+    head = df.head()
+    tail = df.tail()
+    objectsN = df.shape[0]
+    attributesN = df.shape[1]
+    types = df.dtypes
+    missValues = df.isnull().sum()
+    nullValues = (df == 0).sum(axis=0)
+
+    return head, tail, objectsN, attributesN, types, missValues, nullValues
+    
+
+    
 
 """ ATTRIBUTI NUMERICI"""
 
-def numeric_columns_distributions(df, dens=0):
+def numeric_columns_stats(df):
+    numeric_columns = get_numeric_columns(df)
+    
+    statistics = df[numeric_columns].describe()
+    pearson_corr = df[numeric_columns].corr('pearson')
+    spearman_corr = df[numeric_columns].corr('spearman')
+    kendall_corr = df[numeric_columns].corr('kendall')
+
+    return statistics, pearson_corr, spearman_corr, kendall_corr
+
+
+def numeric_columns_distributions(df, density=0):
 
     binsN = round(math.log(len(df), 2) + 1)  # numero di Bins dalla formula di Sturges
-    numeric_columns = get_numeric_columns(df)
 
-    for col in numeric_columns:
-        if dens:
+    for col in get_numeric_columns(df):
+        if density:
             df[col].plot(kind='kde')
             plt.ylabel(col + ' Densities', size=10)
         else:
@@ -49,9 +64,7 @@ def numeric_columns_distributions(df, dens=0):
 
 def numeric_columns_boxplots(df, grouped_by=0):
     
-    numeric_columns = get_numeric_columns(df)
-
-    for col in numeric_columns:
+    for col in get_numeric_columns(df):
         if grouped_by:
             df.boxplot(column=[col], by=grouped_by)
         else:
@@ -63,12 +76,12 @@ def numeric_columns_boxplots(df, grouped_by=0):
 
 def numeric_columns_scatterplot(df, grouped_by, transparence=1, gauss_kde=0):
 
-    combs = itertools.combinations(get_numeric_columns(df), 2)
+    numeric_columns = get_numeric_columns(df)
+    combs = itertools.combinations(numeric_columns, 2)
 
     for col_comb in combs:
-        
         plt.figure(figsize=(6, 4))
-        
+
         if gauss_kde:
             x = df[col_comb[0]].values
             y = df[col_comb[1]].values
@@ -85,12 +98,14 @@ def numeric_columns_scatterplot(df, grouped_by, transparence=1, gauss_kde=0):
                 y = df[col_comb[1]].loc[df[grouped_by] == i].values
                 
                 plt.scatter(x, y,  label='Class = ' + str(i), s=10, alpha=transparence)
+                plt.legend()
  
         plt.title('Scatter Plot {}  VS  {}'.format(col_comb[0], col_comb[1]), pad=20, fontsize=15)
         plt.xlabel(col_comb[0], fontsize=10)
         plt.ylabel(col_comb[1], fontsize=10)
-        plt.legend()
         plt.show()
+    
+    pd.plotting.scatter_matrix(df[numeric_columns], figsize=(15, 10))
 
 
 
@@ -105,27 +120,41 @@ def get_numeric_columns(df):
 
 """ ATTRIBUTI CATEGORICI"""
 
-def categoric_columns_distributions(df, grouped_by=0):
-
-    categoric_columns = get_categoric_columns(df)
-
-    for col in categoric_columns:
-
-        if grouped_by:
-            col_crosstab = pd.crosstab(df[col], df[grouped_by])
-            col_crosstab_prob = col_crosstab.div(
-                col_crosstab.sum(1).astype(float), axis=0)
-            col_crosstab_prob.plot(kind='bar', stacked=True)
-            plt.title(col + ' Crosstab by ' + grouped_by, pad=20, size=15)
-            plt.ylabel('Cross Probabilities', size=10)
+def categoric_columns_distributions(df):
+  
+    for col in get_categoric_columns(df):
             
-        else:
-            df[col].value_counts().plot(kind="bar")
-            plt.title(col, pad=15, size=15)
-            plt.ylabel(col + ' Frequencies', size=10)
-        
+        df[col].value_counts().plot(kind="bar")
+        plt.title(col, pad=15, size=15)
+        plt.ylabel(col + ' Frequencies', size=10)
         plt.xlabel(col + ' Values', size=10)
         plt.show()
+
+
+def categoric_columns_crosstab(df, grouped_by, probabilities=0):
+
+    for col in get_categoric_columns(df):
+
+        col_crosstab = pd.crosstab(df[col], df[grouped_by])
+
+        if probabilities:
+            col_crosstab = col_crosstab.div(
+                col_crosstab.sum(1).astype(float), axis=0)
+            col_crosstab.plot(kind='bar', stacked=True)
+            plt.title(col + ' Crosstab by ' + grouped_by, pad=20, size=15)
+            plt.ylabel('Cross Probabilities', size=10)
+            plt.xlabel(col + ' Values', size=10)
+            plt.show()
+
+            print(col_crosstab)
+        else:
+            col_crosstab.plot(kind='bar', stacked=True)
+            plt.title(col + ' Crosstab by ' + grouped_by, pad=20, size=15)
+            plt.ylabel('Cross Frequencies', size=10)
+            plt.xlabel(col + ' Values', size=10)
+            plt.show()
+
+            print(col_crosstab)
 
 
 def get_categoric_columns(df):
