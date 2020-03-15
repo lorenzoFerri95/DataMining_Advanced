@@ -7,12 +7,6 @@ from collections import defaultdict
 
 
 
-
-
-
-
-
-
 ####################   DA RIVEDERE - PARTE DEL PROF.GUIDOTTI   ########################
 
 
