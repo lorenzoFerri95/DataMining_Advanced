@@ -97,7 +97,7 @@ def numeric_columns_scatterplot(df, grouped_by, transparence=1, gauss_kde=0):
                 x = df[col_comb[0]].loc[df[grouped_by] == i].values
                 y = df[col_comb[1]].loc[df[grouped_by] == i].values
                 
-                plt.scatter(x, y,  label='Class = ' + str(i), s=10, alpha=transparence)
+                plt.scatter(x, y, label='Class = ' + str(i), s=10, alpha=transparence)
                 plt.legend()
  
         plt.title('Scatter Plot {}  VS  {}'.format(col_comb[0], col_comb[1]), pad=20, fontsize=15)
@@ -114,6 +114,7 @@ def get_numeric_columns(df):
     numeric_columns = df._get_numeric_data().columns
     numeric_columns = [
         col for col in numeric_columns if df[col].nunique() > 20]
+
     return numeric_columns
 
 
@@ -133,7 +134,9 @@ def categoric_columns_distributions(df):
 
 def categoric_columns_crosstab(df, grouped_by, probabilities=0):
 
-    for col in get_categoric_columns(df):
+    categoric_columns = [col for col in get_categoric_columns(df) if col != grouped_by]
+
+    for col in categoric_columns:
 
         col_crosstab = pd.crosstab(df[col], df[grouped_by])
 
@@ -161,6 +164,12 @@ def get_categoric_columns(df):
     categoric_columns = df.select_dtypes(include=['object']).columns
     categoric_columns = [
         col for col in categoric_columns if df[col].nunique() < 50]
+    
+    numeric_columns = df._get_numeric_data().columns
+    encoded_categoric = [
+        col for col in numeric_columns if df[col].nunique() < 20]
+    categoric_columns.extend(encoded_categoric)
+    
     return categoric_columns
 
 

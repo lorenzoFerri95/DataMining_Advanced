@@ -2,6 +2,20 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 
+
+
+
+
+
+
+
+
+
+
+
+####################   DA RIVEDERE - PARTE DEL PROF.GUIDOTTI   ########################
+
+
 def prepare_dataset(df, class_name):
     df = remove_missing_values(df)
     numeric_columns = get_numeric_columns(df)
