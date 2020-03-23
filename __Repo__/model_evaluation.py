@@ -2,7 +2,10 @@
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import cross_val_score
+
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from sklearn.metrics import accuracy_score, f1_score, classification_report
+
 from sklearn.metrics import roc_curve, auc, roc_auc_score
 
 
@@ -16,7 +19,9 @@ https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc_crossval.
 
 
 
-def classifier_validate(clf, X_train, y_train):
+""" CLASSIFICATION """
+
+def validate_clf(clf, X_train, y_train):
     
     best_model_scores = cross_val_score(clf, X_train, y_train, cv=5, scoring='accuracy')
     print('Accuracy at a 95 percent confidence interval: %0.2f (+/- %0.2f)' % (
@@ -29,7 +34,7 @@ def classifier_validate(clf, X_train, y_train):
 
 
 
-def classifier_test(clf, X_test, y_test):
+def test_clf(clf, X_test, y_test):
     
     y_pred = clf.predict(X_test)
     
@@ -55,3 +60,16 @@ def classifier_test(clf, X_test, y_test):
     plt.tick_params(axis='both', which='major', labelsize=16)
     plt.show()
 
+
+
+
+""" REGRESSION """
+
+
+def test_reg(reg, X_test, y_test):
+
+    y_pred = reg.predict(X_test)
+    
+    print('R2: %.3f' % r2_score(y_test, y_pred))
+    print('MSE: %.3f' % mean_squared_error(y_test, y_pred))
+    print('MAE: %.3f' % mean_absolute_error(y_test, y_pred))

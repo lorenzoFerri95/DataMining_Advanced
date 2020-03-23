@@ -5,6 +5,9 @@ import pandas as pd
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 
+from matplotlib.colors import ListedColormap
+
+
 
 
 def main():
@@ -15,6 +18,13 @@ def main():
 
     statistics, pearson_corr, spearman_corr, kendall_corr = numeric_columns_stats(df)
     spearman_corr
+
+
+
+
+
+##########################################  DATA UNDERSTANDING ANTE MODELING  #############################################
+
 
 
 def dataset_state(df):
@@ -170,6 +180,24 @@ def get_categoric_columns(df):
     categoric_columns.extend(encoded_categoric)
     
     return categoric_columns
+
+
+
+
+
+
+""" ATTRIBUTI TEMPORALI"""
+
+
+
+
+
+
+
+
+
+
+##########################################  DATA UNDERSTANDING POST MODELING  #############################################
 
 
 
