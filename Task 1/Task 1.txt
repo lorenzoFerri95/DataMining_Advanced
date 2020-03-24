@@ -14,11 +14,11 @@ Evaluate each classifier using Accuracy, Precision, Recall, F1, ROC, AUC and Lif
 
 --------------------------------
 
-Try to reduce the dimensionality of the dataset using the methods studied (or new ones).
+1- Try to reduce the dimensionality of the dataset using the methods studied (or new ones).
 Test PCA and try to solve the classification task in two dimensions.
 Plot the dataset in the two new dimensions and observe the decision boundary and the one of the trained algorithms.
 
-Analyze the value distribution of the class to predict and turn the dataset into
+2- Analyze the value distribution of the class to predict and turn the dataset into
 an imbalanced version reaching a strong majority-minority distribution (e.g. 96%-4%).
 Then solve again the classification task adopting the various techniques studied (or new ones).
 
