@@ -21,12 +21,6 @@ def main():
 
 
 
-
-
-##########################################  DATA UNDERSTANDING ANTE MODELING  #############################################
-
-
-
 def dataset_state(df):
     head = df.head()
     tail = df.tail()
@@ -189,15 +183,6 @@ def get_categoric_columns(df):
 """ ATTRIBUTI TEMPORALI"""
 
 
-
-
-
-
-
-
-
-
-##########################################  DATA UNDERSTANDING POST MODELING  #############################################
 
 
 

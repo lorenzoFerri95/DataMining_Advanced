@@ -1,5 +1,8 @@
-
+import itertools
+import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+import data_understanding
 
 from sklearn.model_selection import cross_val_score
 
@@ -59,6 +62,50 @@ def test_clf(clf, X_test, y_test):
     plt.legend(loc="lower right", fontsize=14, frameon=False)
     plt.tick_params(axis='both', which='major', labelsize=16)
     plt.show()
+
+
+
+def decision_boundary_scatterplots(X_test, y_test, clf):
+
+    numeric_columns = data_understanding.get_numeric_columns(X_test)
+    combs = itertools.combinations(numeric_columns, 2)
+
+    cmap_light = ListedColormap(['orange', 'cyan', 'cornflowerblue'])
+    cmap_bold = ListedColormap(['darkorange', 'c', 'darkblue'])
+
+    h = .02  # step size in the mesh
+
+    for col_comb in combs:
+
+        X=np.array(X_test[list(col_comb)])
+
+        # Plot the decision boundary. For that, we will assign a color to each
+        # point in the mesh [x_min, x_max]x[y_min, y_max].
+        x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
+        y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
+
+        xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+
+        clf.fit(X, y_test)
+
+        Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
+
+        # Put the result into a color plot
+        Z = Z.reshape(xx.shape)
+        plt.figure(1, figsize=(8, 4))
+        plt.pcolormesh(xx, yy, Z, cmap=cmap_light)
+
+        # Plot also the training points
+        plt.scatter(X[:, 0], X[:, 1], c=y_test, edgecolors='k', cmap=cmap_bold)
+        plt.xlim(xx.min(), xx.max())
+        plt.ylim(yy.min(), yy.max())
+        plt.title('Decision Boundary {} vs {}'.format(col_comb[0], col_comb[1]), fontsize=20, pad=20)
+        plt.xlabel(col_comb[0], fontsize=15)
+        plt.ylabel(col_comb[1], fontsize=15)
+        plt.tick_params(axis='both', which='major', labelsize=10)
+
+        plt.show()
+
 
 
 
