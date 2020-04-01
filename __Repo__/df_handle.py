@@ -1,4 +1,6 @@
 import os
+import sys
+
 import numpy as np
 import pandas as pd
 from collections import defaultdict
@@ -43,6 +45,23 @@ def setup_df(trainFileName, outClass=None, testFileName=None, testPortion=0.3):
 
         return df
 
+
+
+
+def export_results(X_test, y_test, clf_or_reg, exoprt_path, outFileName='pred_results'):
+
+    final_testSet = X_test
+
+    y_test_df = pd.DataFrame(np.array(y_test), index=final_testSet.index, columns=['y_test'])
+
+    final_testSet = final_testSet.join(y_test_df)
+
+    y_pred = clf_or_reg.predict(X_test)
+    y_pred_df = pd.DataFrame(y_pred, index=final_testSet.index, columns=['y_pred'])
+
+    final_testSet = final_testSet.join(y_pred_df)
+
+    final_testSet.to_csv(path_or_buf = exoprt_path + '\\' + outFileName + '.csv', sep=',', encoding='utf-8', index=False)
 
 
 """
