@@ -1,0 +1,113 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{fancyhdr} %per personalizzare l'intestazione
+\usepackage[italian]{babel}
+\usepackage{tabularx}
+\usepackage{lscape}
+\usepackage[title]{appendix}
+\usepackage{rotating}
+\usepackage[margin=3.0cm]{geometry}
+\usepackage{natbib}
+\usepackage[T1]{fontenc}
+\usepackage{wrapfig} %immagine all'interno del testo
+\graphicspath{ {figures/} }
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{chngcntr}
+\usepackage{amsmath}
+\addtolength{\topmargin}{-1cm}
+\addtolength{\textheight}{1.1cm}
+
+\pagenumbering{roman} %pagine iniziali con numeri romani
+
+
+\title{Report Data Mining II}
+\author{Ferri Lorenzo (607828) \\ email \href{mailto:lorenzoferri1995@gmail.com}{lorenzoferri1995@gmail.com} \and Pappolla Roberta (534109) \\ email
+ \href{mailto:r.pappolla@studenti.unipi.it}{r.pappolla@studenti.unipi.it} \and Ema Ilic (602796) \\ email \href{mailto:e.ilic@studenti.unipi.it}{e.ilic@studenti.unipi.it}}
+\date{Data Mining (654AA), Anno accademico 2019/2020}
+
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+
+\newpage
+\listoffigures
+\listoftables
+\newpage
+
+\pagenumbering{arabic} %conversione in numeri arabi
+
+
+\section{Data Understanding and Preparation}
+
+Il dataset di training fornito è costituito da 8143 Oggetti e 7 Attributi: 'date', 'Temperature', 'Humidity', 'Light', 'CO2', 'HumidityRatio', 'Occupancy'. Quest'ultimo è l'attributo binario in output su cui deve essere eseguita la classificazione. 'Date' è il momento temporale in cui vengono rilevati i valori dei restanti attributi, che sono tutti numerici. La serie temporale riguarda 6 giorni, dal 2015-02-04 alle 17:51:00 al 2015-02-10 alle 09:33:00, con una frequenza temporale di un secondo. Le evidenze suggeriscono che il task principale riguardi la previsione in un determinato istante della presenza o meno di un soggetto in una stanza, tramite il monitoraggio costante delle variazioni dei parametri numerici sopra elencati. \newline
+Il dataset non presenta alcun Missing Value e gli unici Null Values presenti, a parte quelli ovviamente presenti in 'Occupancy', sono 5160 valori dell'attributo 'Light'. Questi valori nulli in ogni caso sono coerenti con il significato dell'attributo e non sembrano costituire un errore di rilevazione. E' plausibile in effetti che la luce di una stanza possa essere 0, ad esempio quando questa viene tenuta chiusa e inutilizzata o nelle ore notturne. Da questo punto di vista dunque non sono state applicate trasformazioni preparatorie ai dati.
+\\ \\
+Sono state rappresentate tutte le distribuzioni dei valori degli attributi numerici tramite Istogrammi e Funzioni di Densità di Probabilità. Tutti gli attributi presentano un picco di frequenze sulla parte bassa dei valori, caratteristica questa che è meno evidente per gli attributi 'Temperature', 'Humidity' e 'HumidityRatio', mentre è decisamente accentuata negli attributi 'Light' e 'CO2'.
+
+\begin{figure}[H]
+\includegraphics[width=7cm]{Light Histogram.png}
+\includegraphics[width=7cm]{Light Densities.png}
+
+
+\includegraphics[width=7cm]{CO2 Histogram.png}
+\includegraphics[width=7cm]{CO2 Densities.png}
+
+\caption{\label{fig:frog1}Distribuzioni Attributi Numerici}
+\end{figure}
+
+\noindent Una tale distribuzione dei valori suggerisce la possibilità che 0 e 450 circa siano rispettivamente i valori standard di 'Light' e 'CO2' nella stanza quando nessuno vi è presente. Valori diversi invece indicano una certa attività nella stanza. Tale ipotesi è avvalorata dai BoxPlot dei due attributi con valori raggruppati per classe in output.
+
+\begin{figure}[H]
+\includegraphics[width=7cm]{Light Boxplot by Occupancy.png}
+\includegraphics[width=7cm]{CO2 Boxplot by Occupancy.png}
+
+\caption{\label{fig:frog1}Box Plot Attributi Numerici}
+\end{figure}
+
+\noindent valori pari a 1 dell'attributo 'Occupancy' sono associati più probabilmente a valori dei due attributi diversi dal picco nelle distribuzioni. Le due mediane dei valori di 'Light'e 'CO2' quando 'Occupancy' è 1 sono rispettivamente 450 e 950 circa.
+\\ \\
+Sono stati prodotti gli Scatter Plot di ciascuna coppia di attributi numerici. I due attributi con la maggior dipendenza lineare sono ovviamente risultati 'Humidity' ed 'Humidity Ratio'. L'indice di correlazione di Pearson per i due è: \newline
+Corr('Humidity'; 'Humidity Ratio') = 0.955 \newline
+Di fatto i due attributi esprimono lo stesso concetto, l'umidità, in due formati diversi (umidità assoluta e umidità relativa nell'aria). Sebbene fosse possibile decidere di eliminare uno di essi, riducendo le dimensioni del dataset senza perdere informazioni, ciò non è stato fatto perché il dataset è già costituito da pochi attributi e la complessità non è un problema. \newline
+Un'altra coppia di attributi con una correlazione apprezzabile sono risultati 'Humidity Ratio' e 'CO2' (con correlazione di Pearson di 0.626).
+
+\begin{figure}[H]
+\includegraphics[width=7cm]{Humidity vs Humidity Ratio Scatterplot.png}
+\includegraphics[width=7cm]{CO2 vs Humidity Ratio Scatterplot.png}
+
+\caption{\label{fig:frog1}Scatter Plot Attributi Numerici}
+\end{figure}
+
+\noindent Un altro risultato notevole esaminando gli Scatter Plot è che l'unico attributo che riesce a discriminare bene tra le classi in output, almeno da un primo elementare approccio grafico, è 'Light'.
+
+\begin{figure}[H]
+\includegraphics[width=7cm]{Light vs Temperature Scatterplot.png}
+\includegraphics[width=7cm]{Light vs Humidity Scatterplot.png}
+\caption{\label{fig:frog1}Scatter Plot Attributi Numerici}
+\end{figure}
+
+
+\section{Task 1}
+
+\subsection{Basic Classification and Regression}
+
+
+
+
+\section{Task 2}
+
+
+\section{Task 3}
+
+
+\section{Task 4}
+
+
+\section{Task 5}
+
+
+\end{document}

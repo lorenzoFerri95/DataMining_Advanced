@@ -5,8 +5,7 @@ from collections import defaultdict
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
-from sklearn.linear_model import LogisticRegression
-from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge, Lasso
 from scipy.special import expit
 import matplotlib.pyplot as plt
 
@@ -53,38 +52,36 @@ def adjust_predict(clf, X_test, thr=0.5):
 
 
 
-def oneDim_logisticReg(X_train, X_test, y_train, y_test, selected_col, selected_col_max=None, outClass='Out Class'):
+def oneDim_logisticReg(X_train, X_test, y_train, y_test, x, x_max=None, y='Output Class'):
 
-    X_train_oneDim = X_train[[selected_col]]
-    X_test_oneDim = X_test[[selected_col]]
+    x_train_oneDim = X_train[[x]]
+    x_test_oneDim = X_test[[x]]
 
     clf = LogisticRegression(random_state=0)
-    clf.fit(X_train_oneDim, y_train)
+    clf.fit(x_train_oneDim, y_train)
 
     print('Coefficient:', clf.coef_, end='\n\n')
     print('Intercept:', clf.intercept_)
 
     print('\n')
-    logisticReg = expit(sorted(X_test_oneDim.values) * clf.coef_ + clf.intercept_).ravel()
-    plt.plot(sorted(X_test_oneDim.values), logisticReg, color='red', linewidth=3)
-    
-    plt.scatter(X_train_oneDim.values, y_train.values)
+    plt.scatter(x_test_oneDim, y_test)
+    logisticReg = expit(sorted(x_test_oneDim.values) * clf.coef_ + clf.intercept_).ravel()
+    plt.plot(sorted(x_test_oneDim.values), logisticReg, color='red', linewidth=3)
 
-    selected_col_min = X_test_oneDim.min()[0] - 1
-    plt.axis(xmin=selected_col_min, xmax=selected_col_max)
-    plt.xlabel(selected_col, fontsize=15)
-    plt.ylabel(outClass, fontsize=15)
-    plt.title('Logistic Regression on ' + selected_col, fontsize=20, pad=20)
+    plt.axis(xmin=x_test_oneDim.min()[0] - 1, xmax=x_max)
+    plt.xlabel(x, fontsize=15)
+    plt.ylabel(y, fontsize=15)
+    plt.title('Logistic Regression with ' + x, fontsize=20, pad=20)
     plt.tick_params(axis='both', which='major', labelsize=10)
     plt.show()
 
     print('\n')
     print('Model Validation on Training Set', end='\n\n\n')
-    model_evaluation.validate_clf(clf, X_train_oneDim, y_train)
+    model_evaluation.validate_clf(clf, x_train_oneDim, y_train)
     
     print('\n\n')
     print('Model Test on Test Set', end='\n\n\n')
-    model_evaluation.test_clf(clf, X_test_oneDim, y_test)
+    model_evaluation.test_clf(clf, x_test_oneDim, y_test)
 
 
 
@@ -94,25 +91,30 @@ def oneDim_logisticReg(X_train, X_test, y_train, y_test, selected_col, selected_
 
 
 
-def oneDim_linearReg(X_test, y_train, selected_col, selected_col_max, outClass='Out Class'):
+def oneDim_linearReg(X_train, X_test, y_train, y_test, x, y='Output Variable'):
     
-    X_test_oneDim = X_test[[selected_col]]
+    x_train_oneDim = X_train[[x]]
+    x_test_oneDim = X_test[[x]]
 
     reg = LinearRegression()
-    reg.fit(X_test_oneDim, y_train)
+    reg.fit(x_train_oneDim, y_train)
 
     print('Coefficients: \n', reg.coef_, end='\n\n')
     print('Intercept: \n', reg.intercept_)
 
-    y_pred = reg.predict(X_test_oneDim)
+    y_pred = reg.predict(x_test_oneDim)
 
-
-    plt.scatter(X_test_oneDim, y_train,  color='black')
-    plt.plot(X_test_oneDim, y_pred, color='blue', linewidth=3)
-    plt.xlabel('Height')
-    plt.ylabel('Mass')
-
+    plt.scatter(x_test_oneDim, y_test)
+    plt.plot(x_test_oneDim, y_pred, color='red', linewidth=3)
+    
+    plt.xlabel(x, fontsize=15)
+    plt.ylabel(y, fontsize=15)
+    plt.title('Linear Regression with ' + x, fontsize=20, pad=20)
+    plt.tick_params(axis='both', which='major', labelsize=10)
     plt.show()
+
+    print('Model Test on Test Set', end='\n\n')
+    model_evaluation.test_reg(reg, x_test_oneDim, y_test)
 
 
 

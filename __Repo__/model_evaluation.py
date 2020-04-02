@@ -77,7 +77,7 @@ def decision_boundary_scatterplots(X_test, y_test, clf):
 
     for col_comb in combs:
 
-        X=np.array(X_test[list(col_comb)])
+        X=np.array(X_test[[col_comb]])
 
         # Plot the decision boundary. For that, we will assign a color to each
         # point in the mesh [x_min, x_max]x[y_min, y_max].
