@@ -14,6 +14,34 @@ from sklearn.model_selection import RandomizedSearchCV
 import df_handle
 import model_evaluation
 
+
+
+
+def main():
+
+    X_train, X_test, y_train, y_test = df_handle.setup_df('train.csv', 'outClass', 'test.csv')  # import e setup Dataset
+
+
+    model = DecisionTreeClassifier()  #seleziona il modello
+    model.get_params(deep=False)  # per conoscere tutti i possibili iper-parametri del modello
+
+    params_domain_dic = {'min_samples_leaf': range(1,100)}  #setta il range in cui devono essere cercati gli iper-parametri migliori per il modello
+    nbr_iter = 100   #setta il numero di terazioni che l'algoritmo Random Search deve eseguire per trovare i parametri migliori
+    
+    clf = fit_best_clf(X_train=X_train, y_train=y_train,
+    model=model, nbr_iter=nbr_iter, params_domain_dic=params_domain_dic)  # fitting del miglior modello
+    
+
+    # validazione del miglior modello
+    model_evaluation.validate_clf(clf=clf, X_train=X_train, y_train=y_train)   #Cross-Validation dul Training Set
+    model_evaluation.feature_importance(clf=clf, X_train=X_train, y_train=y_train)  #plot dell'importanza degli attributi
+    model_evaluation.decision_boundary_scatterplots(clf=clf, X_train=X_train, y_train=y_train)   #plot dei decision boundary su ogni coppia di attributi
+
+    # test del miglior modello
+    model_evaluation.test_clf(clf=clf, X_test=X_test, y_test=y_test)
+
+
+
 """
 https://scikit-learn.org/stable/auto_examples/feature_selection/plot_rfe_with_cross_validation.html
 
@@ -26,13 +54,15 @@ https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_com
 
 
 
+##########################################  CLASSIFICATION  ##############################################
 
-""" CLASSIFICATION """
 
+def fit_best_clf(X_train, y_train, model=DecisionTreeClassifier(), params_domain_dic={'min_samples_leaf': range(1,150)}, nbr_iter=100):
 
-def fit_best_clf(X_train, y_train, model=DecisionTreeClassifier(), params_domain_dic={'min_samples_leaf': range(1,150)}, iterN=100):
+    #Random Search che cerca e fitta il miglior modello facendo 100 diversi tentativi con diversi valori degli iper-parametri
+    #alla fine viene scelto il modello che porta all' f1 score maggiore.
 
-    search = RandomizedSearchCV(model, param_distributions=params_domain_dic, n_iter=iterN, scoring='f1_macro', random_state=100)
+    search = RandomizedSearchCV(model, param_distributions=params_domain_dic, n_iter=nbr_iter, scoring='f1_macro', random_state=100)
     search.fit(X_train, y_train)
 
     best_params = search.best_params_
@@ -52,7 +82,7 @@ def adjust_predict(clf, X_test, thr=0.5):
 
 
 
-def oneDim_logisticReg(X_train, X_test, y_train, y_test, x, x_max=None, y='Output Class'):
+def oneDim_logisticReg(X_train, X_test, y_train, y_test, x, y='Output Class', x_max=None):
 
     x_train_oneDim = X_train[[x]]
     x_test_oneDim = X_test[[x]]
@@ -87,7 +117,7 @@ def oneDim_logisticReg(X_train, X_test, y_train, y_test, x, x_max=None, y='Outpu
 
 
 
-""" REGRESSION """
+###########################################  REGRESSION  ##############################################
 
 
 
@@ -120,37 +150,6 @@ def oneDim_linearReg(X_train, X_test, y_train, y_test, x, y='Output Variable'):
 
 
 
-
-
-
-
-def main():
-
-    # import e setup Dataset
-
-    X_train, X_test, y_train, y_test = df_handle.setup_df('train.csv', 'outClass', 'test.csv')
-
-
-    # selezione del modello, del dominio dei parametri in cui cercare e del numero di ricerche
-
-    model = DecisionTreeClassifier()
-    
-    model.get_params(deep=False)
-    params_domain_dic = {'min_samples_leaf': range(1,100)}
-    iterN = 100
-
-    # fitting del miglior modello
-
-    clf = fit_best_clf(X_train, y_train,
-    model=model, iterN=iterN, params_domain_dic=params_domain_dic)
-    
-    
-    
-    # valutazione del miglior modello
-
-    model_evaluation.validate_clf(clf, X_train, y_train)
-
-    model_evaluation.test_clf(clf, X_test, y_test)
 
 
 

@@ -2,13 +2,12 @@ import itertools
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
+from sklearn.inspection import permutation_importance
 import data_understanding
 
 from sklearn.model_selection import cross_val_score
-
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from sklearn.metrics import accuracy_score, f1_score, classification_report
-
 from sklearn.metrics import roc_curve, auc, roc_auc_score
 
 
@@ -22,10 +21,16 @@ https://scikit-learn.org/stable/auto_examples/model_selection/plot_roc_crossval.
 
 
 
-""" CLASSIFICATION """
+#############################################  CLASSIFICATION  ###############################################
 
 
 def validate_clf(clf, X_train, y_train):
+
+    '''valadazione del classificatore sul training set con una Corss-Validation che divide il dataset in 5 parti e fa 5 ierazioni:
+    in ogni iterazione 4/5 del dataset vengono usati per istruire il modello (training) e il restante 1/5 viene usato per testarlo (test).
+    in ogni iterazione viene calcolata la performance (prima con l'accuracy poi con l'f1 score) sul test set (del modello istruito sul training)
+    infine vengono riportati i valori medi di accuracy ed f1 calcolati nelle 5 iterazioni.
+    '''
     
     best_model_scores = cross_val_score(clf, X_train, y_train, cv=5, scoring='accuracy')
     print('Accuracy at a 95 percent confidence interval: %0.2f (+/- %0.2f)' % (
@@ -37,7 +42,32 @@ def validate_clf(clf, X_train, y_train):
 
 
 
-def decision_boundary_scatterplots(X_train, y_train, clf):
+def feature_importance(clf, X_train, y_train):
+
+    nbr_features = X_train.shape[1]
+
+    try:
+        tree_feature_importances = clf.feature_importances_
+        sorted_idx = tree_feature_importances.argsort()[-nbr_features:]
+
+        plt.barh(range(nbr_features), tree_feature_importances[sorted_idx])
+        plt.yticks(range(nbr_features), X_train.columns[sorted_idx])
+        plt.title("Feature Importances on Training Set")
+        plt.show()
+
+    except:
+        perm_importance = permutation_importance(clf, X_train, y_train, n_repeats=10, random_state=100, n_jobs=2)
+
+        sorted_idx = perm_importance.importances_mean.argsort()[-nbr_features:]
+
+        plt.boxplot(perm_importance.importances[sorted_idx].T, vert=False, labels=X_train.columns[sorted_idx])
+        plt.title("Permutation Importances on Training Set")
+        #plt.tight_layout()
+        plt.show()
+
+
+
+def decision_boundary_scatterplots(clf, X_train, y_train):
 
     numeric_columns = data_understanding.get_numeric_columns(X_train)
     combs = itertools.combinations(numeric_columns, 2)
@@ -109,7 +139,9 @@ def test_clf(clf, X_test, y_test):
 
 
 
-""" REGRESSION """
+
+
+#################################################  REGRESSION  #################################################
 
 
 def test_reg(reg, X_test, y_test):

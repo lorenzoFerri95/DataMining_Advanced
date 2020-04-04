@@ -9,7 +9,6 @@ from matplotlib.colors import ListedColormap
 
 
 
-
 def main():
     df = pd.read_csv('file')
 
