@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import pandas as pd
 from collections import defaultdict
@@ -6,6 +7,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge, Lasso
+from sklearn import tree
 from scipy.special import expit
 import matplotlib.pyplot as plt
 
@@ -81,6 +83,17 @@ def adjust_predict(clf, X_test, thr=0.5):
 
 
 
+def tree_plot(clf, X_train, tree_depth=8, y_values=['0', '1']):
+
+    fig_size = round(10 + 10*math.log(tree_depth))
+    plt.subplots(nrows = 1, ncols = 1, figsize = (fig_size, fig_size), dpi=200)
+    
+    tree.plot_tree(clf, max_depth=tree_depth, fontsize=24+tree_depth,
+    class_names=y_values, feature_names=X_train.columns, filled=True)
+    plt.show()
+
+
+
 
 def oneDim_logisticReg(X_train, X_test, y_train, y_test, x, y='Output Class', x_max=None):
 
@@ -94,7 +107,7 @@ def oneDim_logisticReg(X_train, X_test, y_train, y_test, x, y='Output Class', x_
     print('Intercept:', clf.intercept_)
 
     print('\n')
-    plt.scatter(x_test_oneDim, y_test)
+    plt.scatter(x_test_oneDim, y_test, s=15)
     logisticReg = expit(sorted(x_test_oneDim.values) * clf.coef_ + clf.intercept_).ravel()
     plt.plot(sorted(x_test_oneDim.values), logisticReg, color='red', linewidth=3)
 
@@ -134,7 +147,7 @@ def oneDim_linearReg(X_train, X_test, y_train, y_test, x, y='Output Variable'):
 
     y_pred = reg.predict(x_test_oneDim)
 
-    plt.scatter(x_test_oneDim, y_test)
+    plt.scatter(x_test_oneDim, y_test, s=15)
     plt.plot(x_test_oneDim, y_pred, color='red', linewidth=3)
     
     plt.xlabel(x, fontsize=15)

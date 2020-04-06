@@ -41,67 +41,291 @@
 \pagenumbering{arabic} %conversione in numeri arabi
 
 
-\section{Data Understanding and Preparation}
+\section{Task 1}
 
-Il dataset di training fornito è costituito da 8143 Oggetti e 7 Attributi: 'date', 'Temperature', 'Humidity', 'Light', 'CO2', 'HumidityRatio', 'Occupancy'. Quest'ultimo è l'attributo binario in output su cui deve essere eseguita la classificazione. 'Date' è il momento temporale in cui vengono rilevati i valori dei restanti attributi, che sono tutti numerici. La serie temporale riguarda 6 giorni, dal 2015-02-04 alle 17:51:00 al 2015-02-10 alle 09:33:00, con una frequenza temporale di un secondo. Le evidenze suggeriscono che il task principale riguardi la previsione in un determinato istante della presenza o meno di un soggetto in una stanza, tramite il monitoraggio costante delle variazioni dei parametri numerici sopra elencati. \newline
-Il dataset non presenta alcun Missing Value e gli unici Null Values presenti, a parte quelli ovviamente presenti in 'Occupancy', sono 5160 valori dell'attributo 'Light'. Questi valori nulli in ogni caso sono coerenti con il significato dell'attributo e non sembrano costituire un errore di rilevazione. E' plausibile in effetti che la luce di una stanza possa essere 0, ad esempio quando questa viene tenuta chiusa e inutilizzata o nelle ore notturne. Da questo punto di vista dunque non sono state applicate trasformazioni preparatorie ai dati.
-\\ \\
-Sono state rappresentate tutte le distribuzioni dei valori degli attributi numerici tramite Istogrammi e Funzioni di Densità di Probabilità. Tutti gli attributi presentano un picco di frequenze sulla parte bassa dei valori, caratteristica questa che è meno evidente per gli attributi 'Temperature', 'Humidity' e 'HumidityRatio', mentre è decisamente accentuata negli attributi 'Light' e 'CO2'.
+\subsection{Data Understanding and Preparation}
 
-\begin{figure}[H]
+Il dataset di training fornito è costituito da 8143 Oggetti e 7 Attributi: 'date', 'Temperature', 'Humidity', 'Light', 'CO2', 'HumidityRatio', 'Occupancy'. Quest'ultimo è l'attributo binario in output su cui deve essere eseguita la classificazione. 'Date' è il momento temporale in cui vengono rilevati i valori dei restanti attributi, che sono tutti numerici. La serie temporale riguarda 6 giorni, dal 2015-02-04 alle 17:51:00 al 2015-02-10 alle 09:33:00, con una frequenza temporale di un secondo. Il task principale riguarda la previsione in un determinato istante della presenza o meno di un soggetto in una stanza. Il dataset non presenta alcun Missing Value e gli unici Null Values presenti sono 5160 valori dell'attributo 'Light'. Questi sono coerenti con il significato dell'attributo (luce nulla quando la stanza è chiusa e inutilizzata o nelle ore notturne) e non sembrano costituire un errore di rilevazione. Da questo punto di vista dunque non sono state applicate trasformazioni preparatorie ai dati. \newline
+Sono state rappresentate tutte le distribuzioni dei valori degli attributi numerici tramite Istogrammi e Funzioni di Densità di Probabilità. Tutti gli attributi presentano un picco di frequenze sulla parte bassa dei valori, caratteristica questa che è decisamente accentuata negli attributi 'Light' e 'CO2'.
+
+\begin{figure}[H] \centering
 \includegraphics[width=7cm]{Light Histogram.png}
-\includegraphics[width=7cm]{Light Densities.png}
-
-
-\includegraphics[width=7cm]{CO2 Histogram.png}
 \includegraphics[width=7cm]{CO2 Densities.png}
 
 \caption{\label{fig:frog1}Distribuzioni Attributi Numerici}
 \end{figure}
 
-\noindent Una tale distribuzione dei valori suggerisce la possibilità che 0 e 450 circa siano rispettivamente i valori standard di 'Light' e 'CO2' nella stanza quando nessuno vi è presente. Valori diversi invece indicano una certa attività nella stanza. Tale ipotesi è avvalorata dai BoxPlot dei due attributi con valori raggruppati per classe in output.
 
-\begin{figure}[H]
-\includegraphics[width=7cm]{Light Boxplot by Occupancy.png}
-\includegraphics[width=7cm]{CO2 Boxplot by Occupancy.png}
+\begin{wrapfigure}[16]{r}{0.5\textwidth}
+\includegraphics[width=6cm]{Light Boxplot by Occupancy.png}
+\includegraphics[width=6cm]{CO2 Boxplot by Occupancy.png}
+\end{wrapfigure}
 
-\caption{\label{fig:frog1}Box Plot Attributi Numerici}
-\end{figure}
+\noindent E' possibile che 0 e 450 circa siano rispettivamente i valori standard di 'Light' e 'CO2' nella stanza quando nessuno è presente. Valori diversi invece potrebbero indicare una certa attività nella stanza. Tale ipotesi è avvalorata dai Box Plot dei due attributi con valori raggruppati per classe in output. Valori pari a 1 dell'attributo 'Occupancy' sono associati più probabilmente a valori dei due attributi diversi dal picco nelle distribuzioni. Le due mediane dei valori di 'Light'e 'CO2' quando 'Occupancy' è 1 sono rispettivamente 450 e 950 circa. \newline
+Sono stati riprodotti gli Scatter Plot di ciascuna coppia di attributi numerici. I due attributi con la maggior dipendenza lineare sono ovviamente risultati 'Humidity' ed 'Humidity Ratio'. L'indice di correlazione di Pearson per i due è pari a 0.955. Di fatto i due attributi esprimono lo stesso concetto, l'umidità, in due formati diversi (assoluta e relativa). Sebbene fosse possibile decidere di eliminare uno di essi ciò non è stato fatto perché la complessità del dataset non è un problema. Da un primo elementare approccio grafico l'unico attributo che riesce a discriminare bene tra le classi in output è 'Light'. L'attributo che ha mostrato la correlazione più elevata con 'Light' è stato 'Temperature': Pearson Corr = 0.65, Spearman Corr = 0.565, Kendall Corr = 0.415.
 
-\noindent valori pari a 1 dell'attributo 'Occupancy' sono associati più probabilmente a valori dei due attributi diversi dal picco nelle distribuzioni. Le due mediane dei valori di 'Light'e 'CO2' quando 'Occupancy' è 1 sono rispettivamente 450 e 950 circa.
-\\ \\
-Sono stati prodotti gli Scatter Plot di ciascuna coppia di attributi numerici. I due attributi con la maggior dipendenza lineare sono ovviamente risultati 'Humidity' ed 'Humidity Ratio'. L'indice di correlazione di Pearson per i due è: \newline
-Corr('Humidity'; 'Humidity Ratio') = 0.955 \newline
-Di fatto i due attributi esprimono lo stesso concetto, l'umidità, in due formati diversi (umidità assoluta e umidità relativa nell'aria). Sebbene fosse possibile decidere di eliminare uno di essi, riducendo le dimensioni del dataset senza perdere informazioni, ciò non è stato fatto perché il dataset è già costituito da pochi attributi e la complessità non è un problema. \newline
-Un'altra coppia di attributi con una correlazione apprezzabile sono risultati 'Humidity Ratio' e 'CO2' (con correlazione di Pearson di 0.626).
-
-\begin{figure}[H]
+\begin{figure}[H] \centering
 \includegraphics[width=7cm]{Humidity vs Humidity Ratio Scatterplot.png}
-\includegraphics[width=7cm]{CO2 vs Humidity Ratio Scatterplot.png}
-
-\caption{\label{fig:frog1}Scatter Plot Attributi Numerici}
-\end{figure}
-
-\noindent Un altro risultato notevole esaminando gli Scatter Plot è che l'unico attributo che riesce a discriminare bene tra le classi in output, almeno da un primo elementare approccio grafico, è 'Light'.
-
-\begin{figure}[H]
 \includegraphics[width=7cm]{Light vs Temperature Scatterplot.png}
-\includegraphics[width=7cm]{Light vs Humidity Scatterplot.png}
+
 \caption{\label{fig:frog1}Scatter Plot Attributi Numerici}
 \end{figure}
 
 
-\section{Task 1}
 
-\subsection{Basic Classification and Regression}
+\subsection{Basic Classification Methods}
+
+I modelli base per la classificazione (Deciosion Tree, K-NN, Naive Bayes e Logistic Regression) sono stati calibrati sul Training Set e testati su entrambi i Test Set. Lo scopo di questi modelli non è classificare una Time Series ma le istanze di test sulla base dei valori in input, motivo per cui l'attributo relativo al tempo, 'date', è stato eliminato sia nel Training che nel Test Set. Per tutti i modelli sono state eseguite le tre fasi di: 
+\begin{enumerate}
+	\item \textbf{Training del modello}, cercando i migliori Iper-Parametri (nei modelli in cui risultasse necessario) mediante una Random Search eseguita ottimizzando il valore dell'f1 score medio di 5 ierazioni della Cross-Validation (Random Rearch CV con una 5 fold Cross-Validation). La decisione dell'f1 score come parametro da ottimizzare deriva dalla maggior attenzione riservata alle performance in termini di Precision e Recall per la classe 1 in output ('Occupancy' della stanza) piuttosto che alla semplice Accuracy su tutte le classi.
+	
+	\item \textbf{Validazione del modello}, mediante una 5 fold Cross-Validation del miglior classificatore ottenuto nella fase di Training del modello. Sono stati calcolati i valori medi di Accuracy ed f1 score medio, riportandone l'intervallo di confidenza al 95\%. Sono stati prodotti inoltre i grafici dell'importanza degli attributi nel predire l'output sul Training Set e i grafici dei Decision Boundary dei modelli calibrati su ciascuna coppia di attributi.
+	
+	\item \textbf{Test del modello}, calcolando le misure di performance Accuracy, f1 score per ciascuna classe in output, f1 score medio ponderato per le classi in output, Precision, Recall e ROC Curve sul Test Set.
+\end{enumerate}
+
+\noindent Si riportano i risultati delle 3 fasi per i vari modelli:
+\\ \\
+\textbf{Decision Tree}: La Random Search è stata eseguita più volte con 100 iterazioni ciascuna, cercando il miglior valore del numero minimo di istanze di ciascun nodo per poter essere un Leaf Node ('min samples leaf'), in un dominio molto ampio [1, 1000]. La performance è più bassa per valori bassi dell'iper-parametro e si stabilizza quando il suo valore supera le centinaia. Il risultato migliore viene quindi ottenuto con un albero semplice, non overfittato sui dati. Con un 'min samples leaf' elevato l'esito dell'albero è sempre lo stesso: le istanze di test con valore 'Light' inferiore o uguale a 365.125, che nel Training Set sono 6333, vengono classificate 0, le restanti con valori superiori, 1810 oggetti del Training Set, vengono classificate 1.
+
+\begin{wrapfigure}[14]{r}{0.5\textwidth}
+\includegraphics[width=7cm]{Decision Tree Plot.png}
+\end{wrapfigure}
+
+
+\noindent L'attributo 'Light' riveste un'importanza totale nella classificazione. Dal suo Decision Boundary è evidente che suddivide le classi in output in maniera molto eterogenea. La Cross-Validation sul Training Set ha restituito: Accuracy con confidenza del 95\%: 0.98 (+/- 0.05); F1 Score con confidenza del 95\%: 0.97 (+/- 0.06) \newline
+Un singolo Decision Boundary lineare è sufficiente a discriminare bene nelle classi in output e raggiunge il miglior risultato sul Test Set. Questo significa che è meglio non complicare il modello cercando Boundary che individuino anche gli oggetti misclassificati sul Training Set. Questi casi non rappresentano aree densamente popolate dalla classe misclassificata e un modello che li individua risulterebbe solo overfittato. 
+
+\begin{figure}[H] \centering
+\includegraphics[width=7cm]{Feature Importance Decision Tree.png}
+\includegraphics[width=8cm]{Decision Boundary Decision Tree Light vs Temperature.png}
+\caption{\label{fig:frog1}Feature Importance and Decision Boundary}
+\end{figure}
+
+
+\noindent Risultati del test del modello sui due Test Set:
+
+
+\begin{center}
+\begin{tabular}{ | m{13em} | m{3cm}| m{3cm} | } 
+\hline
+& Test Set 1 & Test Set 2 \\
+\hline\hline \centering
+Accuracy: & 0.9786 & 0.9931 \\
+\hline \centering
+F1-score: & [0.9829, 0.9714] & [0.9956, 0.9838] \\ 
+\hline \centering
+Weighted Avg F1-score: & 0.9787 & 0.9931 \\ 
+\hline \centering
+Precision: & [1.00, 0.95] &  [1.00, 0.97] \\
+\hline \centering
+Recall: & [0.97, 1.00] & [0.99, 0.99] \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{figure}[H] \centering
+\includegraphics[width=7cm]{ROC Curve Test 1 Decision Tree.png}
+\includegraphics[width=7cm]{ROC Curve Test 2 Decision Tree.png}
+\caption{\label{fig:frog1}Decision Tree Test on Test Set 1 and Test Set 2}
+\end{figure}
+
+\noindent L'ipotesi formulata inizialmente in fase di Data Understanding sembra essere confermata: l'attributo 'Light' è sufficiente per predire la classe in output, con un semplice split che divide i casi in cui la stanza è lievemente o per niente illuminata ('Light' <= 365.125), caso tipico di assenza di persone all'interno, dai casi in cui la stanza è apprezzabilmente illuminata, perché ad esempio le finestre sono state aperte o è stata accesa la luce da qualcuno.
+\\ \\
+
+\noindent\textbf{K-NN}: La Random Search è stata eseguita per 10 ierazioni, cercando i migliori valori del numero di punti nelle vicinanze degli oggetti da classificare, nel dominio [1, 30], e del peso da dare a questi punti per classificare l'istanza. La miglior combinazione di iper-parametri è stata: 'weights': 'uniform', 'n neighbors': 26. \newline
+L'attributo più importante è sempre 'Light' ma anche 'CO2' riveste una seppur minima importanza. La Cross-Validation sul Training Set ha restituito una performance lievemente peggiore di quella del Decision Tree: \newline
+Accuracy con confidenza del 95\%: 0.97 (+/- 0.04) \newline
+F1 Score con confidenza del 95\%: 0.96 (+/- 0.07) \newline
+
+\begin{figure}[H] \centering
+\includegraphics[width=7cm]{Feature Importance K-NN.png}
+\includegraphics[width=8cm]{Decision Boundary }
+\caption{\label{fig:frog1}K-NN Validation}
+\end{figure}
+
+\noindent La performance sui Test Set è peggiore di quella del singolo split perl'attributo 'Light', quindi 'CO2' in realtà non aggiunge significatività al modello.
+
+\begin{center}
+\begin{tabular}{ | m{13em} | m{3cm}| m{3cm} | } 
+\hline
+& Test Set 1 & Test Set 2 \\
+\hline\hline \centering
+Accuracy: & 0.9782 & 0.9707 \\
+\hline \centering
+F1-score: & [0.9826, 0.9709] & [0.9812, 0.9347] \\ 
+\hline \centering
+Weighted Avg F1-score: & 0.9783 & 0.9714 \\ 
+\hline \centering
+Precision: & [1.00, 0.95] &  [1.00, 0.88] \\
+\hline \centering
+Recall: & [0.97, 1.00] & [0.96, 1.00] \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{figure}[H] \centering
+\includegraphics[width=7cm]{ROC Curve Test 1 K-NN.png}
+\includegraphics[width=7cm]{ROC Curve Test 2 K-NN.png}
+\caption{\label{fig:frog1}K-NN Test on Test Set 1 and Test Set 2}
+\end{figure}
 
 
 
+\noindent\textbf{Naive Bayes}: Non è necessario il Tuning di nessun iper-parametro. Gli esiti del modello sono del tutto analoghi a quelli del K-NN: oltre a 'Light' anche la 'CO2' riveste una minima importanza. Di nuovo le performance in termini di Cross-Validation sul Training Set e di Test sul Test Set sono lievemente peggiori del Decision Tree banale.
+
+\begin{center}
+\begin{tabular}{ | m{13em} | m{3cm}| m{3cm} | } 
+\hline
+& Test Set 1 & Test Set 2 \\
+\hline\hline \centering
+Accuracy: & 0.9774 & 0.9876 \\
+\hline \centering
+F1-score: & [0.9820, 0.9699] & [0.9921, 0.9711] \\ 
+\hline \centering
+Weighted Avg F1-score: & 0.9776 & 0.9876 \\ 
+\hline \centering
+Precision: & [1.00, 0.95] &  [1.00, 0.95] \\
+\hline \centering
+Recall: & [0.97, 0.99] & [0.99, 0.99] \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{figure}[H] \centering
+\includegraphics[width=7cm]{ROC Curve Test 1 Naive Bayes.png}
+\includegraphics[width=7cm]{ROC Curve Test 2 Naive Bayes.png}
+\caption{\label{fig:frog1}Naive Bayes Test on Test Set 1 and Test Set 2}
+\end{figure}
+
+
+\noindent\textbf{Logistic Regression}: Non è necessario il Tuning di nessun iper-parametro. Il modello ottenuto è il seguente:
+
+\begin{equation}
+P = \frac{1}{1 + \text{exp}(19.32 - 1.4 * \text{Temp} - 0.04 * \text{Humid} + 0.02 * \text{Light} + 0.01 * \text{CO2} - 0.1 * \text{HumidRatio})}
+\end{equation}
+
+\noindent Si assiste ad un incremento ulteriore dell'importanza della CO2 e ad una minima importanza anche dell'attributo 'Temperature'. La Cross-Validation sul Training Set ha restituito valori leggermente migliori del Decision Tree, perché la varianza è minore: \newline
+Accuracy con confidenza del 95\%: 0.98 (+/- 0.03) \newline
+F1 Score con confidenza del 95\%: 0.97 (+/- 0.05) \newline
+
+
+\begin{figure}[H] \centering
+\includegraphics[width=7cm]{Feature Importance Logistic Regression.png}
+\includegraphics[width=8cm]{Decision Boundary }
+\caption{\label{fig:frog1}Decision Tree Validation}
+\end{figure}
+
+In ogni caso le performance sui Test Set sono ancora peggiori del Decision Tree.
+
+\begin{center}
+\begin{tabular}{ | m{13em} | m{3cm}| m{3cm} | } 
+\hline
+& Test Set 1 & Test Set 2 \\
+\hline\hline \centering
+Accuracy: & 0.9764 & 0.9842 \\
+\hline \centering
+F1-score: & [0.9811, 0.9683] & [0.9900, 0.9619] \\ 
+\hline \centering
+Weighted Avg F1-score: & 0.9765 & 0.9841 \\ 
+\hline \centering
+Precision: & [0.99, 0.95] &  [0.99, 0.97] \\
+\hline \centering
+Recall: & [0.97, 0.99] & [0.99, 0.95] \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{figure}[H] \centering
+\includegraphics[width=7cm]{ROC Curve Test 1 Naive Bayes.png}
+\includegraphics[width=7cm]{ROC Curve Test 2 Naive Bayes.png}
+\caption{\label{fig:frog1}Logistic Regression Test on Test Set 1 and Test Set 2}
+\end{figure}
+
+La regressione logistica è stata calibrata e testata anche con il solo attributo 'Light' in input. Il modello ottenuto è il seguente:
+
+\begin{equation}
+P = \frac{1}{1 + \text{exp}(0.025 - 8.752 * \text{Light})}
+\end{equation}
+
+
+\begin{wrapfigure}[15]{r}{0.5\textwidth}
+\includegraphics[width=7cm]{Logistic Regression con 'Light'.png}
+\caption{\label{fig:frog1}Logistic Regression}
+\end{wrapfigure}
+
+\noindent Le performance sui Test sono identiche a quelle del Decision Tree iniziale perché questo modello porta allo stesso Decision Boundary singolo.
+
+
+
+\subsection{Regression}
+
+Poiché 'Light' è risultato ampiamente l'attributo più importante è stato scelto per tentare di predirne i valori mediante le regressioni. E' stata calibrata una regressione lineare (in due dimensioni) con solo l'attributo 'Temperature' in input, che è quello più correlato con 'Light'.
+
+\begin{equation}
+\text{Light} = -2447.03 + 124.47 * \text{Temp}
+\end{equation}
+
+\begin{wrapfigure}[15]{r}{0.5\textwidth}
+\includegraphics[width=8cm]{Light vs Temperature Linear Regression.png}
+\caption{\label{fig:frog1}Linear Regression}
+\end{wrapfigure}
+
+\noindent La performance viene misurata con il Coefficiente di Determinazione, lo Scarto Quadratico Medio e lo Scarto Assoluto Medio su entrambi i Test Set. \newline
+
+
+\begin{tabular}{ | m{3em} | m{2cm}| m{2cm} | } 
+\hline
+& Test Set 1 & Test Set 2 \\
+\hline\hline \centering
+R2: & 0.512 & 0.444 \\
+\hline \centering
+MSE: & 30530.250 & 24109.752 \\ 
+\hline \centering
+MAE: & 152.073 & 131.116 \\ 
+\hline
+\end{tabular}
+\\ \\
+
+\noindent E' stata prodotta la regressione multipla aggiungendo tutti gli altri attributi numerici in input. Il modello è stato regolarizzato per tentare di ridurne la complessità, ponendo più vicini a zero i parametri che non migliorano sensibilmente la predizione dell'output. Il miglior risultato è stato raggiunto con la Ridge Regression, ma sul secondo Test Set la performance peggiora.
+
+
+\begin{equation}
+\text{Light} = -1176.14 + 0.35 * \text{CO2} -5.78  * \text{Humid} -15.83  * \text{HumidRatio} +59.83  * \text{Temp}
+\end{equation}
+
+\begin{tabular}{ | m{3em} | m{2cm}| m{2cm} | }
+\hline
+& Test Set 1 & Test Set 2 \\
+\hline\hline \centering
+R2: & 0.595 & 0.153 \\
+\hline \centering
+MSE: & 25364.214 & 36724.966 \\ 
+\hline \centering
+MAE: & 131.360 & 148.516 \\ 
+\hline
+\end{tabular}
+
+
+\subsection{Dimensionality Reduction}
+
+
+\subsection{Imbalanced Learning}
+ 
 
 \section{Task 2}
 
+\subsection{Support Vector Machines (SVM)}
+
+\subsection{Neural Networks and Deep Learning}
+
+
+\subsection{Ensemble Learning}
+
 
 \section{Task 3}
+
+\subsection{Forecasting}
 
 
 \section{Task 4}

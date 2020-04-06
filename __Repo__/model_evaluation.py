@@ -62,7 +62,7 @@ def feature_importance(clf, X_train, y_train):
 
         plt.boxplot(perm_importance.importances[sorted_idx].T, vert=False, labels=X_train.columns[sorted_idx])
         plt.title("Permutation Importances on Training Set")
-        #plt.tight_layout()
+        plt.tight_layout()
         plt.show()
 
 
@@ -98,7 +98,7 @@ def decision_boundary_scatterplots(clf, X_train, y_train):
         plt.pcolormesh(xx, yy, Z, cmap=cmap_light)
 
         # Plot also the training points
-        plt.scatter(X[:, 0], X[:, 1], c=y_train, edgecolors='k', cmap=cmap_bold)
+        plt.scatter(X[:, 0], X[:, 1], c=y_train, edgecolors='k', s=20, cmap=cmap_bold)
         plt.xlim(xx.min(), xx.max())
         plt.ylim(yy.min(), yy.max())
         plt.title('Decision Boundary {} vs {}'.format(col_comb[0], col_comb[1]), fontsize=20, pad=20)
