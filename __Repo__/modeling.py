@@ -27,7 +27,7 @@ def main():
     model = DecisionTreeClassifier()  #seleziona il modello
     model.get_params(deep=False)  # per conoscere tutti i possibili iper-parametri del modello
 
-    params_domain_dic = {'min_samples_leaf': range(1,100)}  #setta il range in cui devono essere cercati gli iper-parametri migliori per il modello
+    params_domain_dic = {'min_samples_split': range(1,200), 'min_samples_leaf': range(1,100)}  #setta il range in cui devono essere cercati gli iper-parametri migliori per il modello
     nbr_iter = 100   #setta il numero di terazioni che l'algoritmo Random Search deve eseguire per trovare i parametri migliori
     
     clf = fit_best_clf(X_train=X_train, y_train=y_train,
@@ -59,12 +59,14 @@ https://scikit-learn.org/stable/auto_examples/classification/plot_classifier_com
 ##########################################  CLASSIFICATION  ##############################################
 
 
-def fit_best_clf(X_train, y_train, model=DecisionTreeClassifier(), params_domain_dic={'min_samples_leaf': range(1,150)}, nbr_iter=100):
+def fit_best_clf(X_train, y_train, model=DecisionTreeClassifier(),
+params_domain_dic={'min_samples_split': range(1,1000), 'min_samples_leaf': range(1,1000)},
+nbr_iter=100, score_metric='f1_macro'):
 
     #Random Search che cerca e fitta il miglior modello facendo 100 diversi tentativi con diversi valori degli iper-parametri
     #alla fine viene scelto il modello che porta all' f1 score maggiore.
 
-    search = RandomizedSearchCV(model, param_distributions=params_domain_dic, n_iter=nbr_iter, scoring='f1_macro', random_state=100)
+    search = RandomizedSearchCV(model, param_distributions=params_domain_dic, n_iter=nbr_iter, scoring=score_metric, random_state=100)
     search.fit(X_train, y_train)
 
     best_params = search.best_params_

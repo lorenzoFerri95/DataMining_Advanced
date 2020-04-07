@@ -36,8 +36,8 @@ def validate_clf(clf, X_train, y_train):
     print('Accuracy at a 95 percent confidence interval: %0.2f (+/- %0.2f)' % (
         best_model_scores.mean(), best_model_scores.std() * 2), end='\n\n')
 
-    best_model_scores = cross_val_score(clf, X_train, y_train, cv=5, scoring='f1_macro')
-    print("F1 Score at a 95 percent confidence interval: %0.2f (+/- %0.2f)" % (
+    best_model_scores = cross_val_score(clf, X_train, y_train, cv=5, scoring='f1_weighted')
+    print("Weighted Average F1 Score at a 95 percent confidence interval: %0.2f (+/- %0.2f)" % (
         best_model_scores.mean(), best_model_scores.std() * 2))
 
 
@@ -101,7 +101,7 @@ def decision_boundary_scatterplots(clf, X_train, y_train):
         plt.scatter(X[:, 0], X[:, 1], c=y_train, edgecolors='k', s=20, cmap=cmap_bold)
         plt.xlim(xx.min(), xx.max())
         plt.ylim(yy.min(), yy.max())
-        plt.title('Decision Boundary {} vs {}'.format(col_comb[0], col_comb[1]), fontsize=20, pad=20)
+        plt.title('Decision Boundary {} vs {} on Training Set'.format(col_comb[0], col_comb[1]), fontsize=20, pad=20)
         plt.xlabel(col_comb[0], fontsize=15)
         plt.ylabel(col_comb[1], fontsize=15)
         plt.tick_params(axis='both', which='major', labelsize=10)
