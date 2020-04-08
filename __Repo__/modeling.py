@@ -74,6 +74,8 @@ nbr_iter=100, score_metric='f1_macro'):
 
     clf = search.best_estimator_
 
+    del search, best_params
+
     return clf
 
 
@@ -128,6 +130,8 @@ def oneDim_logisticReg(X_train, X_test, y_train, y_test, x, y='Output Class', x_
     print('Model Test on Test Set', end='\n\n\n')
     model_evaluation.test_clf(clf, x_test_oneDim, y_test)
 
+    del x_train_oneDim, x_test_oneDim, clf, logisticReg
+
 
 
 
@@ -160,6 +164,8 @@ def oneDim_linearReg(X_train, X_test, y_train, y_test, x, y='Output Variable'):
 
     print('Model Test on Test Set', end='\n\n')
     model_evaluation.test_reg(reg, x_test_oneDim, y_test)
+
+    del x_train_oneDim, x_test_oneDim, reg, y_pred
 
 
 

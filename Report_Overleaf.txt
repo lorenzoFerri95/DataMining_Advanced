@@ -73,7 +73,7 @@ I modelli base per la classificazione (Deciosion Tree, K-NN, Naive Bayes e Logis
 
 \begin{figure}[H] \centering
 \includegraphics[width=7cm]{Decision Tree Plot.png}
-\includegraphics[width=8cm]{Decision Boundary Decision Tree Light vs Temperature.png}
+\includegraphics[width=10cm]{Decision Boundary Decision Tree CO2 vs Light.png}
 
 \caption{\label{fig:frog1}Decision Tree Results}
 \end{figure}
@@ -103,15 +103,15 @@ Recall: & [0.97, 1.00] & [0.99, 0.99] \\
 L'ipotesi formulata inizialmente in fase di Data Understanding per l'attributo 'Light' sembra essere confermata. Esso è sufficiente a predire la classe in output, con un semplice split che divide i casi in cui la stanza è lievemente o per niente illuminata ('Light' <= 365.125), caso tipico di assenza di persone all'interno, dai casi in cui la stanza è apprezzabilmente illuminata, perché ad esempio le finestre sono state aperte o è stata accesa la luce da qualcuno.
 \\ \\
 
-\noindent\textbf{K-NN}: La Random Search è stata eseguita cercando i migliori valori del numero di punti nelle vicinanze degli oggetti da classificare, nel dominio [1, 50], e del peso da dare a questi punti per classificare l'istanza. La miglior combinazione di Iper-Parametri è stata: 'weights': 'uniform', 'n neighbors': 45. L'attributo più importante è sempre 'Light' ma anche 'CO2' riveste una seppur minima importanza.
+\noindent\textbf{K-NN}: La Random Search è stata eseguita cercando i migliori valori del numero di punti nelle vicinanze degli oggetti da classificare, nel dominio [1, 50], e del peso da dare a questi punti per classificare l'istanza. La miglior combinazione di Iper-Parametri è: 'weights': 'uniform', 'n neighbors': 45. 
 
 \begin{figure}[H] \centering
 \includegraphics[width=7cm]{Feature Importance K-NN.png}
-\includegraphics[width=8cm]{Decision Boundary }
-\caption{\label{fig:frog1}K-NN Results}
+\includegraphics[width=10cm]{Decision Boundary K-NN CO2 vs Light.png}
 \end{figure}
 
-\noindent La Cross-Validation sul Training Set ha restituito una performance lievemente peggiore di quella del Decision Tree: Accuracy con confidenza del 95\%: 0.97 (+/- 0.04); F1 Score medio pesato con confidenza del 95\%: 0.97 (+/- 0.04). Anche la performance sui Test Set è peggiore, quindi 'CO2' in realtà non aggiunge significatività al modello.
+\noindent L'attributo più importante è sempre 'Light' ma anche 'CO2' riveste una seppur minima importanza. La Cross-Validation sul Training Set ha restituito una performance lievemente peggiore di quella del Decision Tree: Accuracy con confidenza del 95\%: 0.97 (+/- 0.04); F1 Score medio pesato con confidenza del 95\%: 0.97 (+/- 0.04). Anche la performance sui Test Set è peggiore, quindi 'CO2' in realtà non aggiunge significatività al modello.
+\\
 
 \begin{center}
 \begin{tabular}{ | m{13em} | m{3cm}| m{3cm} | } 
@@ -130,16 +130,21 @@ Recall: & [0.97, 1.00] & [0.96, 1.00] \\
 \hline
 \end{tabular}
 \end{center}
+\\
+
+\noindent L'AUC delle ROC Curve è rispettivamente 0.984 e 0.985 per i due Test Set
+\\ \\
+
+\noindent\textbf{Naive Bayes}: Non è necessario il Tuning di nessun iper-parametro. Gli esiti del modello sono del tutto analoghi a quelli del K-NN: oltre a 'Light' anche la 'CO2' riveste una minima importanza.
+
 
 \begin{figure}[H] \centering
-\includegraphics[width=7cm]{ROC Curve Test 1 K-NN.png}
-\includegraphics[width=7cm]{ROC Curve Test 2 K-NN.png}
-\caption{\label{fig:frog1}K-NN Test on Test Set 1 and Test Set 2}
+\includegraphics[width=7cm]{Feature Importance Naive Bayes.png}
+\includegraphics[width=10cm]{Decision Boundary Naive Bayes CO2 vs Light.png}
+\caption{\label{fig:frog1}Decision Tree Validation}
 \end{figure}
 
-
-
-\noindent\textbf{Naive Bayes}: Non è necessario il Tuning di nessun iper-parametro. Gli esiti del modello sono del tutto analoghi a quelli del K-NN: oltre a 'Light' anche la 'CO2' riveste una minima importanza. Di nuovo le performance in termini di Cross-Validation sul Training Set e di Test sul Test Set sono lievemente peggiori del Decision Tree banale.
+\noindent Di nuovo le performance in termini di Cross-Validation sul Training Set e di Test sul Test Set sono lievemente peggiori del Decision Tree banale.
 
 \begin{center}
 \begin{tabular}{ | m{13em} | m{3cm}| m{3cm} | } 
@@ -177,7 +182,7 @@ P = \frac{1}{1 + \text{exp}(19.32 - 1.4 * \text{Temp} - 0.04 * \text{Humid} + 0.
 
 \begin{figure}[H] \centering
 \includegraphics[width=7cm]{Feature Importance Logistic Regression.png}
-\includegraphics[width=8cm]{Decision Boundary }
+\includegraphics[width=10cm]{Decision Boundary Logistic Regression CO2 vs Light.png}
 \caption{\label{fig:frog1}Decision Tree Validation}
 \end{figure}
 
@@ -227,13 +232,13 @@ P = \frac{1}{1 + \text{exp}(0.025 - 8.752 * \text{Light})}
 
 Poiché 'Light' è risultato ampiamente l'attributo più importante è stato scelto per tentare di predirne i valori mediante le regressioni. E' stata calibrata una regressione lineare (in due dimensioni) con solo l'attributo 'Temperature' in input, che è quello più correlato con 'Light'.
 
+
 \begin{equation}
 \text{Light} = -2447.03 + 124.47 * \text{Temp}
 \end{equation}
 
 \begin{wrapfigure}[15]{r}{0.5\textwidth}
 \includegraphics[width=8cm]{Light vs Temperature Linear Regression.png}
-\caption{\label{fig:frog1}Linear Regression}
 \end{wrapfigure}
 
 \noindent La performance viene misurata con il Coefficiente di Determinazione, lo Scarto Quadratico Medio e lo Scarto Assoluto Medio su entrambi i Test Set. \newline

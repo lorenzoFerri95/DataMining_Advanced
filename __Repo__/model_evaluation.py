@@ -40,6 +40,8 @@ def validate_clf(clf, X_train, y_train):
     print("Weighted Average F1 Score at a 95 percent confidence interval: %0.2f (+/- %0.2f)" % (
         best_model_scores.mean(), best_model_scores.std() * 2))
 
+    del best_model_scores
+
 
 
 def feature_importance(clf, X_train, y_train):
@@ -55,6 +57,8 @@ def feature_importance(clf, X_train, y_train):
         plt.title("Feature Importances on Training Set")
         plt.show()
 
+        del tree_feature_importances, sorted_idx
+
     except:
         perm_importance = permutation_importance(clf, X_train, y_train, n_repeats=10, random_state=100, n_jobs=2)
 
@@ -65,30 +69,35 @@ def feature_importance(clf, X_train, y_train):
         plt.tight_layout()
         plt.show()
 
+        del perm_importance, sorted_idx
+
+    del nbr_features
 
 
-def decision_boundary_scatterplots(clf, X_train, y_train):
 
-    numeric_columns = data_understanding.get_numeric_columns(X_train)
+def decision_boundary_scatterplots(clf, X, y, mesh_step=0.05):
+
+    numeric_columns = data_understanding.get_numeric_columns(X)
     combs = itertools.combinations(numeric_columns, 2)
+    del numeric_columns
 
-    cmap_light = ListedColormap(['orange', 'cyan', 'cornflowerblue'])
-    cmap_bold = ListedColormap(['darkorange', 'c', 'darkblue'])
+    cmap_light = ListedColormap(['cornflowerblue', 'cyan', 'orange'])
+    cmap_bold = ListedColormap(['darkblue', 'c', 'darkorange'])
 
-    h = .02  # step size in the mesh
+    h = mesh_step  # step size in the mesh
 
     for col_comb in combs:
 
-        X=np.array(X_train[list(col_comb)])
+        new_X = np.array(X[list(col_comb)])
 
         # Plot the decision boundary. For that, we will assign a color to each
         # point in the mesh [x_min, x_max]x[y_min, y_max].
-        x_min, x_max = X[:, 0].min() - .5, X[:, 0].max() + .5
-        y_min, y_max = X[:, 1].min() - .5, X[:, 1].max() + .5
+        x_min, x_max = new_X[:, 0].min() - .5, new_X[:, 0].max() + .5
+        y_min, y_max = new_X[:, 1].min() - .5, new_X[:, 1].max() + .5
 
         xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
 
-        clf.fit(X, y_train)
+        clf.fit(new_X, y)
 
         Z = clf.predict(np.c_[xx.ravel(), yy.ravel()])
 
@@ -98,15 +107,19 @@ def decision_boundary_scatterplots(clf, X_train, y_train):
         plt.pcolormesh(xx, yy, Z, cmap=cmap_light)
 
         # Plot also the training points
-        plt.scatter(X[:, 0], X[:, 1], c=y_train, edgecolors='k', s=20, cmap=cmap_bold)
+        plt.scatter(new_X[:, 0], new_X[:, 1], c=y, edgecolors='k', s=20, cmap=cmap_bold)
         plt.xlim(xx.min(), xx.max())
         plt.ylim(yy.min(), yy.max())
-        plt.title('Decision Boundary {} vs {} on Training Set'.format(col_comb[0], col_comb[1]), fontsize=20, pad=20)
+        plt.title('Decision Boundary {} vs {}'.format(col_comb[0], col_comb[1]), fontsize=20, pad=20)
         plt.xlabel(col_comb[0], fontsize=15)
         plt.ylabel(col_comb[1], fontsize=15)
         plt.tick_params(axis='both', which='major', labelsize=10)
 
         plt.show()
+
+        del xx, yy, Z, new_X, x_min, x_max, y_min, y_max
+
+    del combs, cmap_light, cmap_bold, h
 
 
 
@@ -137,6 +150,8 @@ def test_clf(clf, X_test, y_test):
     plt.tick_params(axis='both', which='major', labelsize=16)
     plt.show()
 
+    del y_pred, y_score, fpr, tpr, roc_auc
+
 
 
 
@@ -151,3 +166,5 @@ def test_reg(reg, X_test, y_test):
     print('R2: %.3f' % r2_score(y_test, y_pred))
     print('MSE: %.3f' % mean_squared_error(y_test, y_pred))
     print('MAE: %.3f' % mean_absolute_error(y_test, y_pred))
+
+    del y_pred
