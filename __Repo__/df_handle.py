@@ -16,31 +16,29 @@ def main():
 
 
 
-def setup_df(trainFileName, outClass=None, testFileName=None, testPortion=0.3):
+def setup_df(trainFileName, y_name=None, testFileName=None, testPortion=0.3, searchIn="../../"):
     
-    if outClass:
-        trainFilePath = find_file(trainFileName)
-        df_train = pd.read_csv(trainFilePath)
+    if y_name:
+        df_train = pd.read_csv(find_file(trainFileName, search_inside_folder = searchIn))
         
-        attributes = [col for col in df_train.columns if col != outClass]
+        X_names = [col for col in df_train.columns if col != y_name]
 
         if testFileName:
-            testFilePath = find_file(testFileName)
-            df_test = pd.read_csv(testFilePath)
+            df_test = pd.read_csv(find_file(testFileName, search_inside_folder = searchIn))
             
-            X_train, X_test = df_train[attributes], df_test[attributes]
-            y_train, y_test = df_train[outClass], df_test[outClass]
+            X_train, X_test = df_train[X_names], df_test[X_names]
+            y_train, y_test = df_train[y_name], df_test[y_name]
 
         else:
-            X = df_train[attributes]
-            y = df_train[outClass]
+            X = df_train[X_names]
+            y = df_train[y_name]
 
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=testPortion, random_state=100, stratify=y)
 
         return X_train, X_test, y_train, y_test
 
     else:
-        filePath = find_file(trainFileName)
+        filePath = find_file(trainFileName, search_inside_folder = searchIn)
         df = pd.read_csv(filePath)
 
         return df
@@ -70,8 +68,8 @@ https://www.geeksforgeeks.org/os-walk-python/
 """
 
 
-def find_file(fileName):
-    for root, dirs, files in os.walk("../../", topdown=True):
+def find_file(fileName, search_inside_folder="../../"):
+    for root, dirs, files in os.walk(search_inside_folder, topdown=True):
         if fileName in files:
             return os.path.join(root, fileName)
     # If file is not found:

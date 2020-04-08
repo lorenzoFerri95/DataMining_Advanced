@@ -75,7 +75,7 @@ def feature_importance(clf, X_train, y_train):
 
 
 
-def decision_boundary_scatterplots(clf, X, y, mesh_step=0.05):
+def decision_boundary_scatterplots(clf, X, y, mesh_step=1.0):
 
     numeric_columns = data_understanding.get_numeric_columns(X)
     combs = itertools.combinations(numeric_columns, 2)
