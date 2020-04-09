@@ -5,9 +5,6 @@ import pandas as pd
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 
-from matplotlib.colors import ListedColormap
-
-
 
 def main():
     df = pd.read_csv('file')

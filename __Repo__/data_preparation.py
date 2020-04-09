@@ -1,8 +1,21 @@
-import numpy as np
 import pandas as pd
 from collections import defaultdict
+import data_understanding
+
+from sklearn.preprocessing import StandardScaler
 
 
+
+def standardize_df(X_train, X_test):
+    X_train_2scale = X_train[data_understanding.get_numeric_columns(X_train)]
+    X_test_2scale = X_test[data_understanding.get_numeric_columns(X_test)]
+
+    scaler = StandardScaler()
+    scaler.fit(X_train)
+    X_train_std = pd.DataFrame(scaler.transform(X_train_2scale), columns=X_train.columns)
+    X_test_std = pd.DataFrame(scaler.transform(X_test_2scale), columns=X_test.columns)
+
+    return X_train_std, X_test_std
 
 
 

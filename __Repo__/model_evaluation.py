@@ -44,12 +44,12 @@ def validate_clf(clf, X_train, y_train):
 
 
 
-def feature_importance(clf, X_train, y_train):
+def feature_importance(estimator, X_train, y_train):
 
     nbr_features = X_train.shape[1]
 
     try:
-        tree_feature_importances = clf.feature_importances_
+        tree_feature_importances = estimator.feature_importances_
         sorted_idx = tree_feature_importances.argsort()[-nbr_features:]
 
         plt.barh(range(nbr_features), tree_feature_importances[sorted_idx])
@@ -60,7 +60,7 @@ def feature_importance(clf, X_train, y_train):
         del tree_feature_importances, sorted_idx
 
     except:
-        perm_importance = permutation_importance(clf, X_train, y_train, n_repeats=10, random_state=100, n_jobs=2)
+        perm_importance = permutation_importance(estimator, X_train, y_train, n_repeats=10, random_state=100, n_jobs=2)
 
         sorted_idx = perm_importance.importances_mean.argsort()[-nbr_features:]
 

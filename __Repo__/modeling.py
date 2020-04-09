@@ -1,26 +1,28 @@
-import math
-import numpy as np
-import pandas as pd
-from collections import defaultdict
+import os
 
+import numpy as np
+
+import matplotlib.pyplot as plt
+import pydotplus
+from sklearn import tree
+from IPython.display import Image
+from scipy.special import expit
+
+from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge, Lasso
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
-from sklearn.linear_model import LogisticRegression, LinearRegression, Ridge, Lasso
-from sklearn import tree
-from scipy.special import expit
-import matplotlib.pyplot as plt
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier, BaggingClassifier, AdaBoostClassifier
 
 from sklearn.model_selection import RandomizedSearchCV
 
-import df_handle
 import model_evaluation
 
 
-
-
 def main():
-
+    import df_handle
+    
     X_train, X_test, y_train, y_test = df_handle.setup_df('train.csv', 'outClass', 'test.csv')  # import e setup Dataset
 
 
@@ -36,11 +38,13 @@ def main():
 
     # validazione del miglior modello
     model_evaluation.validate_clf(clf=clf, X_train=X_train, y_train=y_train)   #Cross-Validation dul Training Set
-    model_evaluation.feature_importance(clf=clf, X_train=X_train, y_train=y_train)  #plot dell'importanza degli attributi
-    model_evaluation.decision_boundary_scatterplots(clf=clf, X_train=X_train, y_train=y_train)   #plot dei decision boundary su ogni coppia di attributi
+    model_evaluation.feature_importance(estimator=clf, X_train=X_train, y_train=y_train)  #plot dell'importanza degli attributi
 
     # test del miglior modello
     model_evaluation.test_clf(clf=clf, X_test=X_test, y_test=y_test)
+
+    #plot dei decision boundary su ogni coppia di attributi
+    model_evaluation.decision_boundary_scatterplots(clf=clf, X=X_train, y=y_train)
 
 
 
@@ -87,14 +91,15 @@ def adjust_predict(clf, X_test, thr=0.5):
 
 
 
-def tree_plot(clf, X_train, tree_depth=8, y_values=['0', '1']):
+def tree_plot(tree_clf, X_train, y_names=['0', '1'], tree_depth=8):
 
-    fig_size = round(10 + 10*math.log(tree_depth))
-    plt.subplots(nrows = 1, ncols = 1, figsize = (fig_size, fig_size), dpi=200)
+    os.environ['PATH'] = os.environ['PATH'] + ';' + os.environ['CONDA_PREFIX'] + r"\Library\bin\graphviz"
+
+    dot_data = tree.export_graphviz(tree_clf, feature_names=X_train.columns, class_names=y_names, filled=True, rounded=True,
+    special_characters=True, max_depth=tree_depth, out_file=None, )  
     
-    tree.plot_tree(clf, max_depth=tree_depth, fontsize=24+tree_depth,
-    class_names=y_values, feature_names=X_train.columns, filled=True)
-    plt.show()
+    graph = pydotplus.graph_from_dot_data(dot_data)  
+    return Image(graph.create_png())
 
 
 

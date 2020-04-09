@@ -3,7 +3,6 @@ import sys
 
 import numpy as np
 import pandas as pd
-from collections import defaultdict
 
 from sklearn.model_selection import train_test_split
 
@@ -46,7 +45,7 @@ def setup_df(trainFileName, y_name=None, testFileName=None, testPortion=0.3, sea
 
 
 
-def export_results(X_test, y_test, clf_or_reg, exoprt_path, outFileName='pred_results'):
+def export_results(X_test, y_test, estimator, exoprt_path, outFileName='pred_results'):
 
     final_testSet = X_test
 
@@ -54,7 +53,7 @@ def export_results(X_test, y_test, clf_or_reg, exoprt_path, outFileName='pred_re
 
     final_testSet = final_testSet.join(y_test_df)
 
-    y_pred = clf_or_reg.predict(X_test)
+    y_pred = estimator.predict(X_test)
     y_pred_df = pd.DataFrame(y_pred, index=final_testSet.index, columns=['y_pred'])
 
     final_testSet = final_testSet.join(y_pred_df)

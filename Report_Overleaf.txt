@@ -66,10 +66,10 @@ Il Training Set fornito è costituito da 8143 Oggetti e 7 Attributi. 'Occupancy'
 
 \subsection{Basic Classification Methods}
 
-I modelli base per la classificazione (Deciosion Tree, K-NN, Naive Bayes e Logistic Regression) sono stati fittati sul Training Set e testati su entrambi i Test Set. Lo scopo di questi modelli non è classificare una Time Series, quindi l'attributo relativo al tempo, 'date', è stato eliminato. Nei modelli in cui risultasse necessario sono stati cercati i migliori Iper-Parametri mediante una Random Search che ottimizzasse il Positive F1 Score medio che esce dalle 5 iterazioni compiute dalla Cross-Validation sul Training Set. (Random Search CV con 5 Fold). La decisione dell'F1 come metrica da ottimizzare deriva dalla maggior attenzione riservata alle performance in termini di Precision e Recall per la classe 1 in output.
-\\ \\
+Lo scopo di questi modelli non è classificare una Time Series, quindi l'attributo relativo al tempo, 'date', è stato eliminato. Nei modelli in cui risultasse necessario sono stati cercati i migliori Iper-Parametri mediante una Random Search che ottimizzasse il Positive F1 Score medio che esce dalle 5 iterazioni compiute dalla Cross-Validation sul Training Set (Random Search CV con 5 Fold). La decisione dell'F1 come metrica da ottimizzare deriva dalla maggior attenzione riservata alle performance in termini di Precision e Recall per la classe 1 in output. I Decision Boundary sono stati rappresentati fittando il modello sulle due dimensioni rappresentate (non rappresenta dunque il reale Boundary su tutto il dataset ma ne fornisce un'approssimazione).
+\\
 
-\noindent \textbf{Decision Tree}: La Random Search CV è stata eseguita più volte con 100 iterazioni ciascuna, cercando la combinazione più efficace degli Iper-Parametri 'min samples split' e 'min samples leaf' in un dominio molto ampio per entrambi [1, 500]. Le performance migliori si hanno per valori alti degli Iper-Parametri, che portano ad alberi semplici, e si stabilizzano quando i loro valori superano le centinaia. L'albero migliore è un semplice split sull'attributo 'Light' al valore 365.125: le istanze classificate positive sono quelle con 'Light' > 365.125. L'attributo 'Light' quindi riveste un'importanza totale nella classificazione.
+\noindent \textbf{Decision Tree}: La Random Search CV è stata eseguita più volte cercando la combinazione più efficace degli Iper-Parametri 'min samples split' e 'min samples leaf' in un dominio molto ampio per entrambi [1, 500]. Le performance migliori si hanno per valori alti degli Iper-Parametri, che portano ad alberi semplici. L'albero migliore è uno split sull'attributo 'Light' al valore 365.125: le istanze classificate positive sono quelle con 'Light' > 365.125. L'attributo 'Light' quindi riveste un'importanza totale nella classificazione.
 
 \begin{figure}[H] \centering
 \includegraphics[width=7cm]{Decision Tree Plot.png}
@@ -78,8 +78,7 @@ I modelli base per la classificazione (Deciosion Tree, K-NN, Naive Bayes e Logis
 \caption{\label{fig:frog1}Decision Tree Results}
 \end{figure}
 
-\noindent La 5 Fold Cross-Validation sul Training Set ha restituito: Accuracy con confidenza del 95\%: 0.98 (+/- 0.05); F1 Score medio pesato con confidenza del 95\%: 0.98 (+/- 0.04). Un singolo Decision Boundary lineare è sufficiente a discriminare bene nelle classi in output e raggiunge il miglior risultato sui Test Set. E' meglio non complicare il modello cercando Boundary che individuino anche gli oggetti misclassificati sul Training Set perché questi casi non rappresentano aree densamente popolate dalla classe misclassificata ed è stato appurato che un modello che le individua risulta solo overfittato sul Training Set e non performa bene sui Test Set.
-
+\noindent Gli oggetti misclassificati sul Training Set sono solo 99 (di cui 90 sulla classe positiva). La 5 Fold Cross-Validation sul Training Set ha restituito: Accuracy con confidenza del 95\% = 0.98 (+/- 0.05); F1 Score medio pesato con confidenza del 95\% = 0.98 (+/- 0.04). Un singolo Decision Boundary lineare è sufficiente a discriminare bene nelle classi in output, gli errori non sono aree densamente popolate. E' stato appurato che modelli più complessi risultano overfittati sul Training Set e non performano bene sui Test Set.
 
 \begin{center}
 \begin{tabular}{ | m{13em} | m{3cm}| m{3cm} | } 
@@ -99,50 +98,48 @@ Recall: & [0.97, 1.00] & [0.99, 0.99] \\
 \end{tabular}
 \end{center}
 
-\noindent L'AUC (Area sotto la ROC Curve) per i due Test Set è 0.992 e 0.997 rispettivamente. \newline
-L'ipotesi formulata inizialmente in fase di Data Understanding per l'attributo 'Light' sembra essere confermata. Esso è sufficiente a predire la classe in output, con un semplice split che divide i casi in cui la stanza è lievemente o per niente illuminata ('Light' <= 365.125), caso tipico di assenza di persone all'interno, dai casi in cui la stanza è apprezzabilmente illuminata, perché ad esempio le finestre sono state aperte o è stata accesa la luce da qualcuno.
-\\ \\
+\noindent L'AUC (Area sotto la ROC Curve) per i due Test Set è 0.983 e 0.994 rispettivamente. \newline
+L'ipotesi formulata inizialmente in fase di Data Understanding per l'attributo 'Light' sembra essere confermata. Esso è sufficiente a predire la classe in output, con un semplice split che divide i casi in cui la stanza è lievemente o per niente illuminata ('Light' <= 365.125), caso tipico di assenza di persone all'interno, dai casi in cui la stanza è apprezzabilmente illuminata, perché ad esempio le finestre sono state aperte o è stata accesa la luce da qualcuno. Nel Training Set sono presenti 5160 oggetti con valore dell'attributo 'Light' pari a 0, tutti questi hanno valore della classe 'Occupancy' pari a 0.
+\\
 
-\noindent\textbf{K-NN}: La Random Search è stata eseguita cercando i migliori valori del numero di punti nelle vicinanze degli oggetti da classificare, nel dominio [1, 50], e del peso da dare a questi punti per classificare l'istanza. La miglior combinazione di Iper-Parametri è: 'weights': 'uniform', 'n neighbors': 45. 
+\noindent\textbf{K-NN}: Poiché il modello si basa sul calcolo delle distanze tra gli oggetti sia il Training che il Test Set sono stati Standardizzati (gli attributi sono stati riportati tutti a media 0 e varianza 1). La Random Search è stata eseguita cercando i migliori valori del numero di punti nelle vicinanze degli oggetti da classificare, nel dominio [1, 50], e del peso da dare a questi punti per classificare l'istanza. La miglior combinazione di Iper-Parametri è 'weights': 'uniform', 'n neighbors': 46. 
 
 \begin{figure}[H] \centering
 \includegraphics[width=7cm]{Feature Importance K-NN.png}
 \includegraphics[width=10cm]{Decision Boundary K-NN CO2 vs Light.png}
 \end{figure}
 
-\noindent L'attributo più importante è sempre 'Light' ma anche 'CO2' riveste una seppur minima importanza. La Cross-Validation sul Training Set ha restituito una performance lievemente peggiore di quella del Decision Tree: Accuracy con confidenza del 95\%: 0.97 (+/- 0.04); F1 Score medio pesato con confidenza del 95\%: 0.97 (+/- 0.04). Anche la performance sui Test Set è peggiore, quindi 'CO2' in realtà non aggiunge significatività al modello.
-\\
+\noindent L'attributo più importante è sempre 'Light' ma anche 'CO2' riveste una seppur minima importanza. La Cross-Validation sul Training Set ha restituito una performance peggiore di quella del Decision Tree: Accuracy con confidenza del 95\% = 0.95 (+/- 0.08); F1 Score medio pesato con confidenza del 95\% = 0.95 (+/- 0.07). Anche la performance sui Test Set è peggiore, quindi 'CO2' in realtà non aggiunge significatività al modello.
 
 \begin{center}
 \begin{tabular}{ | m{13em} | m{3cm}| m{3cm} | } 
 \hline
 & Test Set 1 & Test Set 2 \\
 \hline\hline \centering
-Accuracy: & 0.9782 & 0.971 \\
+Accuracy: & 0.9595 & 0.956 \\
 \hline \centering
-F1-score: & [0.9826, 0.9709] & [0.9813, 0.9352] \\ 
+F1-score: & [0.9684, 0.9434] & [0.9721, 0.8957] \\ 
 \hline \centering
-Weighted Avg F1-score: & 0.9783 & 0.9716 \\ 
+Weighted Avg F1-score: & 0.9593 & 0.9561 \\ 
 \hline \centering
-Precision: & [1.00, 0.95] &  [1.00, 0.88] \\
+Precision: & [0.96, 0.96] &  [0.97, 0.89] \\
 \hline \centering
-Recall: & [0.97, 1.00] & [0.96, 1.00] \\
+Recall: & [0.98, 0.93] & [0.97, 0.90] \\
 \hline
 \end{tabular}
 \end{center}
 
-\noindent L'AUC delle ROC Curve è rispettivamente 0.984 e 0.985 per i due Test Set
-\\ \\
+\noindent L'AUC delle ROC Curve è rispettivamente 0.99 e 0.988 per i due Test Set
+\\
 
-\noindent\textbf{Naive Bayes}: Non è necessario il Tuning di nessun iper-parametro. 
+\noindent\textbf{Naive Bayes}: Non è necessario il Tuning di nessun iper-parametro. Le performances del modello sono analoghe a quelle del K-NN.
 
 \begin{wrapfigure}[10]{r}{0.5\textwidth}
 \includegraphics[width=10cm]{Decision Boundary Naive Bayes CO2 vs Light.png}
-\caption{\label{fig:frog1}Decision Tree Validation}
 \end{wrapfigure}
 
-\noindent Gli esiti del modello sono del tutto analoghi a quelli del K-NN. oltre a 'Light' anche la 'CO2' riveste una minima importanza. Di nuovo le performance in termini di Cross-Validation sul Training Set e di Test sul Test Set sono lievemente peggiori del Decision Tree banale.
-\\ \\ \\
+\noindent Oltre a 'Light' anche la 'CO2' riveste una minima importanza e di nuovo le performance in termini di Cross-Validation sul Training Set e di test sul Test Set sono lievemente peggiori del Decision Tree banale. Solo l'area sotto le ROC Curve è maggiore. Questo significa che usando il 50\% come threshold di probabilità per la classificazione il modello ha una performance peggiore ma in genere risulta più stabile del Decision Tree perché è migliore se facciamo variare il threshold.
+\\ \\
 
 \begin{center}
 \begin{tabular}{ | m{13em} | m{3cm}| m{3cm} | } 
@@ -184,7 +181,7 @@ P = \frac{1}{1 + \text{exp}(19.32 - 1.4 * \text{Temp} - 0.04 * \text{Humid} + 0.
 \caption{\label{fig:frog1}Decision Tree Validation}
 \end{figure}
 
-\noindent La Cross-Validation sul Training Set ha restituito valori leggermente migliori del Decision Tree, perché la varianza è minore: Accuracy con confidenza del 95\%: 0.98 (+/- 0.03); F1 Score medio pesato con confidenza del 95\%: 0.98 (+/- 0.03). In ogni caso le performance sui Test Set sono ancora peggiori del Decision Tree.
+\noindent La Cross-Validation sul Training Set ha restituito valori leggermente migliori del Decision Tree, perché la varianza è minore: Accuracy con confidenza del 95\%: 0.98 (+/- 0.03); F1 Score medio pesato con confidenza del 95\%: 0.98 (+/- 0.03). Le performance sui Test Set sono ancora leggermente peggiori del Decision Tree. L'AUC è risultata la più alta di tutti i modelli, rendendo di fatto la Logistic Regression il modello più stabile.
 
 \begin{center}
 \begin{tabular}{ | m{13em} | m{3cm}| m{3cm} | } 
@@ -210,7 +207,7 @@ Recall: & [0.97, 0.99] & [0.99, 0.95] \\
 \caption{\label{fig:frog1}Logistic Regression Test on Test Set 1 and Test Set 2}
 \end{figure}
 
-La regressione logistica è stata calibrata e testata anche con il solo attributo 'Light' in input. Il modello ottenuto è il seguente:
+\noindent La regressione logistica è stata calibrata e testata anche con il solo attributo 'Light' in input. Il modello ottenuto è il seguente:
 
 \begin{tabular}{ m{20em} m{3cm} }
 \begin{equation}
@@ -226,7 +223,7 @@ P = \frac{1}{1 + \text{exp}(0.025 - 8.752 * \text{Light})}
 
 \subsection{Regression}
 
-Poiché 'Light' è risultato ampiamente l'attributo più importante è stato scelto per tentare di predirne i valori mediante le regressioni. E' stata calibrata una regressione lineare (in due dimensioni) con solo l'attributo 'Temperature' in input, che è quello più correlato con 'Light'.
+Poiché 'Light' è risultato ampiamente l'attributo più importante è stato scelto per tentare di predirne i valori mediante le regressioni. E' stata calibrata una regressione lineare (in due dimensioni) con solo l'attributo 'Temperature' in input, che è quello risultato più correlato con 'Light' nella fase di Data Understanding. La regressione rappresentata è sul Test Set e sono stati eliminati gli oggetti con valore di 'Light' pari a 0 (solo graficamente, non neiìl calcolo dei risultati, per focalizzare l'attenzione sulla parte importante della relazione lineare).
 
 
 \begin{tabular}{ m{20em} m{3cm} }
@@ -276,7 +273,10 @@ MAE: & 131.360 & 148.516 \\
 \end{center}
 
 
-\subsection{Dimensionality Reduction}
+\subsection{Dimensionality Reduction with Decision Tree}
+
+
+\subsection{Dimensionality Reduction with different classifiers}
 
 
 \subsection{Imbalanced Learning}
