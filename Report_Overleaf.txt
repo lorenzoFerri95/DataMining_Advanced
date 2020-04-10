@@ -291,6 +291,28 @@ MAE: & 131.360 & 148.516 \\
 
 \subsection{Ensemble Learning}
 
+\textbf{Random Forest}: I Decision Boundary che hanno restituito i risultati più stabili, apprezzabili dal valore dell'area AUC, sono stati quelli della Logistic Regression e Naive Bayes. Tramite la Random Forest è stato posto l'obiettivo di raggiungere quella stabilità, tramite un Decision Boundary analogo, insieme ad una performance sui Test Set pari a quella ottenuta con il Decision Tree. Lo scopo è stato raggiunto con un modello che ha per Iper-Parametri: 'max features'='log2', 'random state'=0, 'n estimators'=100', 'max depth'=3 e i valori di default per gli altri. Il valore migliore della 'max depth' è stato trovato mediante la Random Search cercando nel dominio [1,100]. Il fatto che sia un valore basso indica che sono sufficienti alberi semplici non overfittati. Le feature diverse da 'Light' aumentano la loro importanza. Il Decision Boundary è più preciso per valori bassi di 'CO2': in quei casi 'Light' viene splittato ad un valore leggermente superiore a 365.125, come si nota dall'albero proposto quì (split a 371.125), al fine di separare con più precisione la zona di maggior contatto tra gli addensamenti delle due classi in output.
+
+\begin{figure}[H] \centering
+\includegraphics[width=7cm]{Random Forest Plot.png}
+\includegraphics[width=9cm]{Feature Importance Random Forest.png}
+\includegraphics[width=10cm]{Decision Boundary Random Forest CO2 vs Light.png}
+\end{figure}
+
+\noindent La 5 Fold Cross-Validation sul Training Set ha restituito: Accuracy con confidenza del 95\% = 0.98 (+/- 0.03); F1 Score medio pesato con confidenza del 95\% = 0.98 (+/- 0.03). Con una varianza minore del Decision Tree semplice il modello risulta più stabile sul Training Set. Sui Test Set i risultati sono identici a quelli del Decision Tree iniziale. Migliora però l'AUC per entrambi i Test Set.
+
+
+\begin{figure}[H] \centering
+\includegraphics[width=7cm]{ROC Curve Test 1 Random Forest.png}
+\includegraphics[width=7cm]{ROC Curve Test 2 Random Forest.png}
+\caption{\label{fig:frog1}Random Forest ROC Curves on Test Set 1 and Test Set 2}
+\end{figure}
+
+
+
+\noindent Quindi, considerando tutto, questo modello risulta migliore del Decision Tree banale iniziale, sebbene solo leggermente.
+
+
 
 \section{Task 3}
 
