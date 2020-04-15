@@ -20,6 +20,9 @@
 \addtolength{\topmargin}{-1cm}
 \addtolength{\textheight}{1.1cm}
 
+\usepackage{float}%per forzare la posizione di un'immagine (H)
+\usepackage{subfig}
+
 \pagenumbering{roman} %pagine iniziali con numeri romani
 
 
@@ -48,17 +51,17 @@
 Il Training Set fornito è costituito da 8143 Oggetti e 7 Attributi. 'Occupancy' è l'attributo binario in output su cui deve essere eseguita la classificazione, che riguarda la previsione della presenza o meno di un soggetto in una stanza. 'Date' è il momento temporale in cui vengono rilevati i valori dei restanti attributi, che sono tutti numerici. La serie temporale riguarda 6 giorni, dal 2015-02-04 alle 17:51:00 al 2015-02-10 alle 09:33:00, con una frequenza di rilevazione di un minuto. Il dataset non presenta alcun Missing Value e gli unici Null Values presenti sono 5160 valori dell'attributo 'Light'. Questi non sembrano costituire un errore di rilevazione perché sono coerenti con il significato dell'attributo (luce nulla quando la stanza è chiusa e inutilizzata o nelle ore notturne). Tutti gli attributi numerici presentano un picco di frequenze sulla parte bassa dei valori, caratteristica questa che è decisamente accentuata negli attributi 'Light' e 'CO2'. E' possibile che 0 e 450 circa siano rispettivamente i valori di 'Light' e 'CO2' nella stanza quando nessuno è presente. Valori diversi invece potrebbero indicare una certa attività nella stanza. Tale ipotesi è avvalorata dai Box Plot dei due attributi con valori raggruppati per classe in output. Le due mediane dei valori di 'Light'e 'CO2' quando 'Occupancy' è 1 sono rispettivamente 450 e 950 circa, molto diversi dai picchi in distribuzione.
 
 \begin{figure}[H] \centering
-\includegraphics[width=7cm]{Light Histogram.png}
-\includegraphics[width=6cm]{Light Boxplot by Occupancy.png}
+\includegraphics[width=7cm]{data_understanding/Light Histogram.png}
+\includegraphics[width=6cm]{data_understanding/Light Boxplot by Occupancy.png}
 
-\includegraphics[width=7cm]{CO2 Densities.png}
-\includegraphics[width=6cm]{CO2 Boxplot by Occupancy.png}
+\includegraphics[width=7cm]{data_understanding/CO2 Densities.png}
+\includegraphics[width=6cm]{data_understanding/CO2 Boxplot by Occupancy.png}
 
 \caption{\label{fig:frog1}Distribuzioni e Box Plot 'Light', 'CO2'}
 \end{figure}
 
 \begin{wrapfigure}[10]{r}{0.5\textwidth}
-\includegraphics[width=7cm]{Light vs Temperature Scatterplot.png}
+\includegraphics[width=7cm]{data_understanding/Light vs Temperature Scatterplot.png}
 \end{wrapfigure}
 
 \noindent Sono stati riprodotti gli Scatter Plot di ciascuna coppia di attributi numerici. I due attributi con la maggior dipendenza lineare sono ovviamente risultati 'Humidity' ed 'Humidity Ratio'. Di fatto i due attributi esprimono lo stesso concetto, l'umidità, in due formati diversi (assoluta e relativa). Sebbene fosse possibile decidere di eliminare uno di essi ciò non è stato fatto perché la complessità del dataset non è un problema. Da un primo elementare approccio grafico l'unico attributo che riesce a discriminare bene tra le classi in output è 'Light'. L'attributo che ha mostrato la correlazione più elevata con 'Light' è stato 'Temperature': Pearson Corr = 0.65, Spearman Corr = 0.565, Kendall Corr = 0.415.
@@ -72,8 +75,8 @@ Lo scopo di questi modelli non è classificare una Time Series, quindi l'attribu
 \noindent \textbf{Decision Tree}: La Random Search CV è stata eseguita più volte cercando la combinazione più efficace degli Iper-Parametri 'min samples split' e 'min samples leaf' in un dominio molto ampio per entrambi [1, 500]. Le performance migliori si hanno per valori alti degli Iper-Parametri, che portano ad alberi semplici. L'albero migliore è uno split sull'attributo 'Light' al valore 365.125: le istanze classificate positive sono quelle con 'Light' > 365.125. L'attributo 'Light' quindi riveste un'importanza totale nella classificazione.
 
 \begin{figure}[H] \centering
-\includegraphics[width=7cm]{Decision Tree Plot.png}
-\includegraphics[width=10cm]{Decision Boundary Decision Tree CO2 vs Light.png}
+\includegraphics[width=7cm]{basic_classification/Decision Tree Plot.png}
+\includegraphics[width=9cm]{basic_classification/Decision Boundary Decision Tree CO2 vs Light.png}
 
 \caption{\label{fig:frog1}Decision Tree Results}
 \end{figure}
@@ -105,8 +108,8 @@ L'ipotesi formulata inizialmente in fase di Data Understanding per l'attributo '
 \noindent\textbf{K-NN}: Poiché il modello si basa sul calcolo delle distanze tra gli oggetti sia il Training che il Test Set sono stati Standardizzati (gli attributi sono stati riportati tutti a media 0 e varianza 1). La Random Search è stata eseguita cercando i migliori valori del numero di punti nelle vicinanze degli oggetti da classificare, nel dominio [1, 50], e del peso da dare a questi punti per classificare l'istanza. La miglior combinazione di Iper-Parametri è 'weights'='uniform', 'n neighbors'=46. 
 
 \begin{figure}[H] \centering
-\includegraphics[width=7cm]{Feature Importance K-NN.png}
-\includegraphics[width=10cm]{Decision Boundary K-NN CO2 vs Light.png}
+\includegraphics[width=7cm]{basic_classification/Feature Importance K-NN.png}
+\includegraphics[width=9cm]{basic_classification/Decision Boundary K-NN CO2 vs Light.png}
 \end{figure}
 
 \noindent L'attributo più importante è sempre 'Light' ma anche 'CO2' riveste una seppur minima importanza. La Cross-Validation sul Training Set ha restituito una performance peggiore di quella del Decision Tree: Accuracy con confidenza del 95\% = 0.95 (+/- 0.08); F1 Score medio pesato con confidenza del 95\% = 0.95 (+/- 0.07). Anche la performance sui Test Set è peggiore, quindi 'CO2' in realtà non aggiunge significatività al modello.
@@ -129,17 +132,19 @@ Recall: & [0.98, 0.93] & [0.97, 0.90] \\
 \end{tabular}
 \end{center}
 
-\noindent L'AUC delle ROC Curve è rispettivamente 0.99 e 0.988 per i due Test Set
+\noindent L'AUC delle ROC Curve è rispettivamente 0.99 e 0.988 per i due Test Set.
 \\
 
-\noindent\textbf{Naive Bayes}: Non è necessario il Tuning di nessun iper-parametro. Le performances del modello sono analoghe a quelle del K-NN.
+\noindent\textbf{Naive Bayes}: Non è necessario il Tuning di nessun iper-parametro.
 
 \begin{wrapfigure}[10]{r}{0.5\textwidth}
-\includegraphics[width=10cm]{Decision Boundary Naive Bayes CO2 vs Light.png}
+\includegraphics[width=9cm]{basic_classification/Decision Boundary Naive Bayes CO2 vs Light.png}
 \end{wrapfigure}
 
-\noindent Oltre a 'Light' anche la 'CO2' riveste una minima importanza e di nuovo le performance in termini di Cross-Validation sul Training Set e di test sul Test Set sono lievemente peggiori dello Stump banale. Solo l'area sotto le ROC Curve è maggiore. Questo significa che usando il 50\% come threshold di probabilità per la classificazione il modello ha una performance peggiore ma in genere risulta più stabile del Decision Tree perché è migliore se facciamo variare il threshold.
+\noindent Come per il K-NN oltre a 'Light' anche la 'CO2' riveste una minima importanza e di nuovo i risultati in termini di Cross-Validation sul Training Set e di test sui Test Set sono lievemente peggiori dello Stump banale. Solo l'area sotto le ROC Curve è maggiore. Questo significa che usando il 50\% come threshold di probabilità per la classificazione il modello ha una performance peggiore ma in genere risulta più stabile del Decision Tree perché i True Positive e False Positive restituiscono risultati migliori se facciamo variare il threshold. \newline
+AUC(Test 1)=0.989, AUC(Test 2)=0.996.
 \\ \\
+
 
 \begin{center}
 \begin{tabular}{ | m{13em} | m{3cm}| m{3cm} | } 
@@ -159,12 +164,6 @@ Recall: & [0.97, 0.99] & [0.99, 0.99] \\
 \end{tabular}
 \end{center}
 
-\begin{figure}[H] \centering
-\includegraphics[width=7cm]{ROC Curve Test 1 Naive Bayes.png}
-\includegraphics[width=7cm]{ROC Curve Test 2 Naive Bayes.png}
-\caption{\label{fig:frog1}Naive Bayes Test on Test Set 1 and Test Set 2}
-\end{figure}
-
 
 \noindent\textbf{Logistic Regression}: Non è necessario il Tuning di nessun iper-parametro. Il modello ottenuto è il seguente:
 
@@ -172,16 +171,16 @@ Recall: & [0.97, 0.99] & [0.99, 0.99] \\
 P = \frac{1}{1 + \text{exp}(19.32 - 1.4 * \text{Temp} - 0.04 * \text{Humid} + 0.02 * \text{Light} + 0.01 * \text{CO2} - 0.1 * \text{HumidRatio})}
 \end{equation}
 
-\noindent Si assiste ad un incremento ulteriore dell'importanza della CO2 e ad una minima importanza anche dell'attributo 'Temperature'. 
+\noindent Si assiste ad un incremento ulteriore dell'importanza di 'CO2' e ad una minima importanza anche dell'attributo 'Temperature'. 
 
 
 \begin{figure}[H] \centering
-\includegraphics[width=7cm]{Feature Importance Logistic Regression.png}
-\includegraphics[width=10cm]{Decision Boundary Logistic Regression CO2 vs Light.png}
+\includegraphics[width=7cm]{basic_classification/Feature Importance Logistic Regression.png}
+\includegraphics[width=9cm]{basic_classification/Decision Boundary Logistic Regression CO2 vs Light.png}
 \caption{\label{fig:frog1}Decision Tree Validation}
 \end{figure}
 
-\noindent La Cross-Validation sul Training Set ha restituito valori leggermente migliori del Decision Tree, perché la varianza è minore: Accuracy con confidenza del 95\%: 0.98 (+/- 0.03); F1 Score medio pesato con confidenza del 95\%: 0.98 (+/- 0.03). Le performance sui Test Set sono ancora leggermente peggiori del Decision Tree. L'AUC è risultata la più alta di tutti i modelli, rendendo di fatto la Logistic Regression il modello più stabile.
+\noindent La Cross-Validation sul Training Set ha restituito valori leggermente migliori del Decision Tree, perché la varianza è minore: Accuracy con confidenza del 95\%: 0.98 (+/- 0.03); F1 Score medio pesato con confidenza del 95\%: 0.98 (+/- 0.03). Le performance sui Test Set sono ancora leggermente peggiori dello Stump ma l'AUC è risultata la più alta di tutti i modelli, rendendo di fatto la Logistic Regression il modello più stabile.
 
 \begin{center}
 \begin{tabular}{ | m{13em} | m{3cm}| m{3cm} | } 
@@ -202,8 +201,8 @@ Recall: & [0.97, 0.99] & [0.99, 0.95] \\
 \end{center}
 
 \begin{figure}[H] \centering
-\includegraphics[width=7cm]{ROC Curve Test 1 Logistic Regression.png}
-\includegraphics[width=7cm]{ROC Curve Test 2 Logistic Regression.png}
+\includegraphics[width=7cm]{basic_classification/ROC Curve Test 1 Logistic Regression.png}
+\includegraphics[width=7cm]{basic_classification/ROC Curve Test 2 Logistic Regression.png}
 \caption{\label{fig:frog1}Logistic Regression Test on Test Set 1 and Test Set 2}
 \end{figure}
 
@@ -214,7 +213,7 @@ Recall: & [0.97, 0.99] & [0.99, 0.95] \\
 P = \frac{1}{1 + \text{exp}(0.025 - 8.752 * \text{Light})}
 \end{equation}
 &
-\includegraphics[width=7cm]{Logistic Regression con 'Light'.png}
+\includegraphics[width=7cm]{basic_classification/Logistic Regression con 'Light'.png}
 \end{tabular}
 
 \noindent Le performance sui Test sono identiche a quelle del Decision Tree iniziale perché questo modello porta allo stesso Decision Boundary singolo.
@@ -231,7 +230,7 @@ Poiché 'Light' è risultato ampiamente l'attributo più importante è stato sce
 \text{Light} = -2447.03 + 124.47 * \text{Temp}
 \end{equation}
 &
-\includegraphics[width=8cm]{Light vs Temperature Linear Regression.png}
+\includegraphics[width=8cm]{regression/Light vs Temperature Linear Regression.png}
 \end{tabular}
 
 
@@ -275,14 +274,200 @@ MAE: & 131.360 & 148.516 \\
 \noindent Rispetto alla regressione lineare semplice la performance migliora di poco sul primo Test Set ma peggiora di molto sul secondo. Quindi gli attributi diversi da 'Temperature' non aiutano a migliorare la predizione su 'Light'.
 
 
-\subsection{Dimensionality Reduction with Decision Tree}
+\subsection{Dimensionality Reduction}
+
+\noindent\textbf{Dimensionality Reduction Tests}: We addressed the task by first testing the various Dimensionality Reduction methods using  the Decision Tree as a classifier. After obtaining the results which we will discuss shortly,  we have tested various classification methods (namely, Decision Tree, KNN, Naïve Bayes and Logistic Regression) on two-component PCA (next paragraph). We started with the Variance Threshold method. We realized that, as expected, the different threshold parameters yielded different numbers of dimensions. Namely, in terms of integers, results of the parameter search can be observed in the adjacent table.
 
 
-\subsection{Dimensionality Reduction with different classifiers}
+\begin{center}
+\begin{tabular}{ | m{7em} | m{5cm}| }
+\hline
+Dataset Shape & Integer Variance Threshold \\
+\hline\hline \centering
+(8143,5) & 0 \\
+\hline \centering
+(8143,4) & 1 \\ 
+\hline \centering
+(8143,3) & 2 \\ 
+\hline \centering
+(8143,2) & 31 \\
+\hline \centering
+(8143,1) & 37926 \\
+\hline
+\end{tabular}
+\end{center}
+
+
+
+\noindent The results of the Variance threshold analysis are exactly the same in terms of precision, accuracy and recall as if the dataset dimensions were not reduced at all when the threshold is anywhere between 1 and 37925 (which yields a number of dimensions between 2 and 4). However, the results significantly worsen for number of dimensions equal to one which is achieved with a threshold of 37926 onwards(Figure 1).
+
+\begin{figure}[H] \centering
+\includegraphics[width=10cm]{dimens_reduction/figure_1.png}
+\caption{\label{fig:frog1}Figure 1}
+\end{figure}
+
+\noindent Univariate Feature Selection, Singular Value Decomposition  and Principal Component Analysis. As the parameter we inserted numbers from k=1 to k=4 number of dimensions, and observed the results. Interestingly enough, the results in terms of  accuracy, precision and recall were all the same for different k number of dimensions, but changed with respect to each of these three DR methods. They however change for each k when other classifiers are applied, such as KNN, Linear Regression and Naïve Bayes. For example when we employ UFS with Linear Regression or Naïve Bayes, the results stay the same for k=1&2, but change for k=3&4. It is also important to mention that the UFS method selects Light when the k=1, Light and CO2 when the k=2, Light, CO2 and temperature when the k=3, Light, CO2, temperature and the humidity ratio when the k=4.Singular Value Decomposition and PCA, however, completely alter the attributes and yield a new single-or multi dimensional array (depending on the k given) instead of selecting the best attributes.
+\\
+
+\noindent The results obtained by the UFS and RFE analysis are identical to the dataset which is not reduced. It is interesting to observe that the RFE method delineated ‘Light’ as the only attribute worth keeping. The results obtained by the PCA are reported in figure 2 and the results obtained by SVD are reported in figure 3. Finally, we can conclude that, using the Decision Tree classifier, none of the methods yielded better results than the non-reduced dataset did. In order to complete the analysis, we should reproduce the results using all the four classifiers, but for the sake of keeping to the page limit of the report, we will not do that.
+
+
+\begin{figure}[H] \centering
+\includegraphics[width=8cm]{dimens_reduction/figure_2.png}
+\includegraphics[width=8cm]{dimens_reduction/figure_3.png}
+\caption{\label{fig:frog1}Figure 2 and 3}
+\end{figure}
+
+
+\noindent\textbf{PCA two component analysis tested on different classifiers}: In addition to experiments on different dimensionality reduction techniques, we tested the PCA analysis with two components (two dimensions) on Decision Tree (Figure 2), KNN(Figure 4), Naïve Bayes(Figure 5), and Logistic Regression(Figure 6). 
+
+\begin{figure}[H] \centering
+\includegraphics[width=8cm]{dimens_reduction/figure_4.png}
+\includegraphics[width=8cm]{dimens_reduction/figure_5.png}
+\includegraphics[width=8cm]{dimens_reduction/figure_6.png}
+\caption{\label{fig:frog1}Figure 4, 5 and 6}
+\end{figure}
+
+
+\noindent The results obtained for the decision tree with two components are slightly worse with respect to the results obtained using the complete dataset. Accuracy with 2-component PCA for KNN remained the same, F1 with respect to the class 0 slightly improved whereas the F1 for the class 1 slightly worsened. The results worsened for the NB and, most importantily,  improved for the Logistic Regression when using only two components in the PCA with respect to applying the Logistic regression to all the attributes in the dataset. Interestingly enough, Logistic regression  with a two component PCA analysis  delivers precision, accuracy and recall results identical to the decision tree when applied to the whole dataset. We tested the results on the second test set (datatest2.txt) and the results improved even further (Figure 10).
+Finally, in the Figure 7 we can observe the two dimensional representation of the dataset obtained with the PCA. Figure 8 shows the same, except for the fact that the training set has been reduced to 1000 samples instead of 8143, and the trend can thus be observed better. It is also interesting to observe the fraction of variance with respect to each of the  5 attributes (date excluded) in Figure 9.
+
+
+\begin{figure}[H] \centering
+\includegraphics[width=8cm]{dimens_reduction/figure_7.png}
+\includegraphics[width=8cm]{dimens_reduction/figure_8.png}
+\includegraphics[width=8cm]{dimens_reduction/figure_9.png}
+\includegraphics[width=8cm]{dimens_reduction/figure_10.png}
+\caption{\label{fig:frog1}Figure 7, 8, 9 and 10}
+\end{figure}
+
+
 
 
 \subsection{Imbalanced Learning}
- 
+
+Successivamente abbiamo verificato la composizione della variabile di output, Occupancy, la quale è così composta: per il valore "0" vi sono 6414 record su 8143 (ovvero il 79\%), invece per quanto riguarda il valore "1" di 1729 record, il 21\%. Possiamo quindi osservare un notevole sbilanciamento verso il valore "0".
+Abbiamo pertanto deciso d'incrementare questo sbilanciamento fino a ottenere uno squilibrio del 97\% per il valore "0", e avere così solo il 3\% di oggetti con valore "1".
+Dopo aver provato le diverse tecniche abbiamo deciso di creare le seguenti tre diverse versioni sbilanciate del training set utilizzando diverse tecniche di undersampling e oversempling: 
+\begin{enumerate}
+    \item \textbf{Undersampled:} la prima versione di data training è stata modificata attraverso una variante del modello "Near Neighbor", ovvero "Near Miss", decrementando così il numero di oggetti con valore "1" da 1729 fino a 198 record, e lasciando invariato il numero di record per il valore "0".
+    \item \textbf{Oversampled:} nel secondo abbiamo invece lasciato invariato il numero di oggetti con valore "1", ed incrementato il numero record per il valore "0" a 55904, in maniera tale che rappresentassero il 97\% del data training implementando il modello "SMOTE".
+    \item \textbf{Undersampled e Oversampled:} la composizione dell'ultimo è stata modificata completamente ottenendo la seguente composizione: 55031 oggetti per il valore "0" e 1702 per l' "1" attraverso l'implementazione delle seguenti tecniche: "Random OverSampler" e "Neighbourhood Cleaning Rule".
+\end{enumerate}
+
+
+\subsubsection{Classificazioni base}
+Procediamo ora ad applicare diverse tecniche di classificazione ai tre training set modificati. Essendo questi sbilanciati in maniera considerevole l'obiettivo è quello di ottenere un valore dell'accuracy almeno pari a classificare sempre con il valore "0", quindi del 97\%.
+\subsubsection*{Decision tree}
+Anche qui si è cercato di ottenere la migliore classificazione attraverso l'uso della Randomized Search, cercando quindi la migliore combinazione degli Iper-Parametri "min samples split"e "min samples leaf". Abbiamo effettuato diverse prove con il numero di iterazioni in un range tra i 150 e 600. I parametri ottenuti sono i seguenti: 
+
+\begin{center}
+\begin{tabular}{ |l|l|l| }
+\hline
+& \textbf{Min samples split} & \textbf{Min samples leaf} \\
+\hline\hline \centering
+\textit{Undersampled} & 308 & 2 \\
+\hline \centering
+\textit{Oversampled} & 432 & 8 \\ 
+\hline \centering
+\textit{Undersampled e Oversampled} & 372 & 90 \\ 
+\hline
+\end{tabular}
+\end{center}
+
+\noindent Le ultime due classificazioni hanno rispettivamente ottenuto nel primo test set una accuracy di 0.90994 e 0.91219, e nel secondo di 0.9477 e 0.96021. Non hanno quindi raggiunto il valore minimo accettabile. 
+Osserviamo quindi i valori ottenuti con la prima classificazione:
+
+\begin{center}
+\begin{tabular}{ |l|l|l| }
+\hline
+& \textbf{Test Set 1} & \textbf{Test Set 2} \\
+\hline\hline \centering
+\textit{Accuracy:} & 0.97673 & 0.99292 \\
+\hline \centering
+\textit{F1-score:} & [0.98144, 0.96881] & [0.99551, 0.98324] \\ 
+\hline \centering
+\textit{Weighted Avg F1-score} & 0.98 & 0.99 \\ 
+\hline
+\textit{Precision:} & [0.99, 0.95] & [1.00, 0.98] \\ 
+\hline \centering
+\textit{Recall:} & [0.97, 0.99] & [0.99, 0.99] \\ 
+\hline
+\end{tabular}
+\end{center}
+I valori ottenuti nel secondo test set sono estremamente positivi, ma comunque inferiori a quelli ottenuti con l'utilizzo dello stesso modello sul training originale.
+Dai grafici sottostanti si può però osservare che nonostante l'accuracy del terzo training set sia inferiore a quella del primo quest'ultimo ha però un'aria sotto la curva maggiore in entrambi i test set. 
+
+\begin{figure}[H]
+  \centering
+  \subfloat[AUC dell'undersampled data training  nei due test set.]{\includegraphics[width=0.385\textwidth]{imbalance/roctree.png}\label{fig:auc1}}
+  \hspace{1.5cm}
+  \subfloat[AUC dell'undersampled e oversampled data training  nei due test set.]{\includegraphics[width=0.385\textwidth]{imbalance/uoroctree.png}\label{fig:auc22}}
+\end{figure}
+
+\subsubsection*{K Nearest Neighbor, Logistic Regression}
+Questi due modelli hanno valori dell'accuracy  nei due test set che partono da 0.91219 e arrivano ad un valore massimo di 0.96021 e non vi è nulla di interessante di cui discutere, possiamo però notare che la combinazione di PCA e Logistic Regression ha ottenuto uno tra i migliori risultati, applicando invece lo stesso modello sul training sbilanciato con tre tecniche differenti non si riesce ad ottiene un risultato ottimale.
+
+\subsubsection*{Naive Bayes}
+Risultati interessanti sono stati ottenuti con il classificatore "Naive Bayes", questo modello non richiedeva nessun Iper-Parametro in input.  
+E' interessante osservare che i dataset che riescono ad ottenere utilizzando il modello 
+\begin{center}
+\begin{tabular}{ |l|l|l| }
+\hline
+& \textbf{Accuracy test set 1} & \textbf{Accuracy test set 2} \\
+\hline\hline \centering
+\textit{Undersampled} & 0.91744 & 0.95888 \\
+\hline \centering
+\textit{Oversampled} & 0.97711 & 0.98985 \\ 
+\hline \centering
+\textit{Undersampled e Oversampled} & 0.97711 & 0.97898 \\ 
+\hline
+\end{tabular}
+\end{center}
+
+
+
+\begin{center}
+\begin{tabular}{ |l|l|l| }
+\hline
+& \textbf{Test Set 1} & \textbf{Test Set 2} \\
+\hline\hline \centering
+\textbf{Oversampled} & & \\
+\hline
+\textit{Accuracy:} & 0.97711 & 0.98985 \\
+\hline \centering
+\textit{F1-score:} & [0.98172, 0.96939] & [0.99354, 0.9762 ] \\ 
+\hline \centering
+\textit{Weighted Avg F1-score} & 0.98 & 0.99 \\ 
+\hline
+\textit{Precision:} & [1.00, 0.95] & [1.00, 0.96] \\ 
+\hline \centering
+\textit{Recall:} & [0.99, 0.99] & [0.99, 0.99] \\ 
+\hline
+\textbf{Undersampled e Oversampled} & & \\
+\hline
+\textit{Accuracy:} & 0.97711 & 0.97897 \\
+\hline \centering
+\textit{F1-score:} & [0.98172, 0.96939] & [0.986746, 0.94922] \\ 
+\hline \centering
+\textit{Weighted Avg F1-score} & 0.98 & 0.98 \\ 
+\hline
+\textit{Precision:} & [1.00, 0.95] & [0.98, 0.96] \\ 
+\hline \centering
+\textit{Recall:} & [0.97, 0.99] & [0.99, 0.94] \\ 
+\hline
+\end{tabular}
+\end{center}
+
+
+
+\begin{figure}[H]
+  \centering
+  \subfloat[AUC dell'oversampled data training nei due test set.]{\includegraphics[width=0.385\textwidth]{imbalance/nbroc2.png}\label{fig:auc1}}
+  \hspace{1.5cm}
+  \subfloat[AUC dell'undersampled e oversampled data training nei due test set.]{\includegraphics[width=0.385\textwidth]{imbalance/nbroc3.png}\label{fig:auc22}}
+\end{figure}
+
 
 \section{Task 2}
 
@@ -294,9 +479,9 @@ MAE: & 131.360 & 148.516 \\
 \textbf{Random Forest}: I Decision Boundary tipici che hanno restituito i risultati più stabili, apprezzabili dal valore degli indici di validazione sul Training Set e dell'area AUC sul Test Set, sono stati quelli della Logistic Regression e Naive Bayes. Tramite la Random Forest è stato posto l'obiettivo di raggiungere quella stabilità, tramite un Decision Boundary analogo, insieme ad una performance sui Test Set pari a quella ottenuta con il Decision Tree. Lo scopo è stato raggiunto con un modello che ha per Iper-Parametri: 'max features'='log2', 'random state'=0, 'n estimators'=100', 'max depth'=3 e i valori di default per gli altri. Il valore migliore della 'max depth' è stato trovato mediante la Random Search cercando nel dominio [1,100] e ottimizzando per l'F1 Score. Il fatto che il 'max depth' ottimale sia un valore basso indica che sono sufficienti singoli alberi semplici non overfittati. Le feature diverse da 'Light' aumentano la loro importanza. Il Decision Boundary è più preciso per valori bassi di 'CO2'. Quando 'CO2' è basso 'Light' viene splittato ad un valore leggermente superiore a 365.125, come si nota dall'albero proposto quì (split a 371.125). In questo modo la zona di maggior contatto tra gli addensamenti delle due classi in output viene separata con più precisione.
 
 \begin{figure}[H] \centering
-\includegraphics[width=7cm]{Random Forest Plot.png}
-\includegraphics[width=9cm]{Feature Importance Random Forest.png}
-\includegraphics[width=10cm]{Decision Boundary Random Forest CO2 vs Light.png}
+\includegraphics[width=6cm]{ensamble/Random Forest Plot.png}
+\includegraphics[width=9cm]{ensamble/Feature Importance Random Forest.png}
+\includegraphics[width=9cm]{ensamble/Decision Boundary Random Forest CO2 vs Light.png}
 \end{figure}
 
 \noindent La 5 Fold Cross-Validation sul Training Set ha restituito: Accuracy con confidenza del 95\% = 0.98 (+/- 0.03); F1 Score medio pesato con confidenza del 95\% = 0.98 (+/- 0.03). Con una varianza minore del Decision Tree semplice il modello risulta più stabile sul Training Set. Sui Test Set i risultati delle metriche di valutazione sono identici a quelli del Decision Tree iniziale. Migliora però l'AUC per entrambi i Test Set: AUC(Test 1)=0.986 AUC(Test 2)=0.996. Dnque il modello è più stabile anche sui Test Set e l'obiettivo è stato raggiunto (questo modello è leggermente migliore dello Stump sul dataset iniziale non trasformato).
@@ -306,8 +491,8 @@ MAE: & 131.360 & 148.516 \\
 \noindent \textbf{Bagging}: Il Bagging è stato eseguito con lo stesso scopo della Random Forest, con classificatori diversi dal Decision Tree: Support Vector Machine, Naive Bayes, Logistic regression. Particolare attenzione è stata riservata a quest'ultimo perché era stato il modello più stabile nella fase di classificazione di base. I risultati migliori in assoluto fino ad ora infatti vengono ottenuti con un Bagging composto da 50 Logistic Regression (non è stato necessario fittare nessun Iper-Parametro, il 'random state' è fissato a 0). A fronte degli stessi risultati della Random Forest sia per la Cross-Validation che per i test abbiamo quì i migliori valori dell'AUC.
 
 \begin{figure}[H] \centering
-\includegraphics[width=7cm]{ROC Curve Test 1 Bagging.png}
-\includegraphics[width=7cm]{ROC Curve Test 2 Bagging.png}
+\includegraphics[width=7cm]{ensamble/ROC Curve Test 1 Bagging.png}
+\includegraphics[width=7cm]{ensamble/ROC Curve Test 2 Bagging.png}
 \end{figure}
 
 \noindent I risultati con gli altri tipi di classificatori base sono tutti peggiori. La Regressione Logistica è risultato il modello migliore anche dopo aver ridotto il Dataset a due dimensioni con la PCA. Dunque è stato fatto un tentativo di classificazione con Bagging sulle Logistic Regressions anche con il dataset bidimensionale uscito dalla PCA. I risultati però sono stati lievemente peggiori di quelli discussi quì sopra.
@@ -316,8 +501,8 @@ MAE: & 131.360 & 148.516 \\
 \noindent \textbf{Boosting}: Come è noto l'AdaBoost Classifier è un Ensamble method che si basa sulla maggior attenzione riservata agli oggetti misclassificati nelle iterazioni precedenti. A questo modello quindi è stato riservato lo scopo di produrre un Decision Boundary che individuasse l'area centrale dello Scatterplot dove è presente un piccolo addensamento di oggetti con label in outpu 0 che sono sempre stati classificati male. Essi potrebbero essere i False Positive che hanno tenuto lievemente più bassa la Precision in tutti i classificatori di base. Lo scopo è stato raggiunto con un modello che usa il Decision Tree come Base Classifier e che ha per Iper-Parametri: 'n estimators'=100, 'random state'=0 e 'learning rate'=0.2, quest'ultimo trovato ottimizzando l'F1 Score tramite una Grid Search nel dominio [0,1] con step 0.1.
 
 
-\begin{wrapfigure}[15]{r}{0.5\textwidth}
-\includegraphics[width=10cm]{Decision Boundary AdaBoost Tree CO2 vs Light.png}
+\begin{wrapfigure}[13]{r}{0.5\textwidth}
+\includegraphics[width=9cm]{ensamble/Decision Boundary AdaBoost Tree CO2 vs Light.png}
 \end{wrapfigure}
 
 \noindent Come si può notare dal Boundary vengono individuati in pratica tutti gli oggetti precedentemente misclassificati sul Training Set. L'esito sia in termini di Cross-Validation sul Training Set che in termini di Test peggiorano sensibilmente. Accuracy ed F1 Score medio pesato passano entrambi ad un valore di 0.93 con due deviazioni standard (95\% di confidenza) dell'ordine di 0.12. Sui Test Set l'Accuracy passa a 0.922 e 0.938 rispettivamente e la Positive Precision peggiora passando a 0.94 e 0.85 rispettivamente. Le AUC poi crollano a 0.905 e 0.91. Il modello è evidentemente overfittato sul Training Set e questo dimostra che gli oggetti al centro dello ScatterPlot, con 'Light' superiore a 600 e 'CO2' intorno a 1000 sono più un caso specifico presente nel Training Set fornito piuttosto che una relazione da cui poter derivare conclusioni sul generali.\newline
