@@ -25,6 +25,11 @@
 
 \pagenumbering{roman} %pagine iniziali con numeri romani
 
+%for numbering figures and tables with section
+%\usepackage{chngcntr}
+%\counterwithin{figure}{section}
+%\usepackage{chngcntr}
+%\counterwithin{table}{section}
 
 \title{Report Data Mining II}
 \author{Ferri Lorenzo (607828) \\ email \href{mailto:lorenzoferri1995@gmail.com}{lorenzoferri1995@gmail.com} \and Pappolla Roberta (534109) \\ email
@@ -163,6 +168,15 @@ Recall: & [0.97, 0.99] & [0.99, 0.99] \\
 \hline
 \end{tabular}
 \end{center}
+
+
+
+\begin{figure}[H] \centering
+\includegraphics[width=6cm]{basic_classification/ROC Curve Test 1 Naive Bayes.png}
+\includegraphics[width=6cm]{basic_classification/ROC Curve Test 2 Naive Bayes.png}
+\caption{\label{fig:frog1}Naive Bayes Test on Test Set 1 and Test Set 2}
+\end{figure}
+
 
 
 \noindent\textbf{Logistic Regression}: Non è necessario il Tuning di nessun iper-parametro. Il modello ottenuto è il seguente:
@@ -346,13 +360,13 @@ Finally, in the Figure 7 we can observe the two dimensional representation of th
 
 \subsection{Imbalanced Learning}
 
-Successivamente abbiamo verificato la composizione della variabile di output, Occupancy, la quale è così composta: per il valore "0" vi sono 6414 record su 8143 (ovvero il 79\%), invece per quanto riguarda il valore "1" di 1729 record, il 21\%. Possiamo quindi osservare un notevole sbilanciamento verso il valore "0".
+Successivamente abbiamo verificato la composizione della variabile di output, Occupancy, la quale è così composta: per il valore "0" vi sono 6414 record su 8143 (ovvero il 79\%), invece per quanto riguarda il valore "1" vi sono 1729 record, il 21\%. Possiamo quindi osservare un notevole sbilanciamento verso il valore "0".
 Abbiamo pertanto deciso d'incrementare questo sbilanciamento fino a ottenere uno squilibrio del 97\% per il valore "0", e avere così solo il 3\% di oggetti con valore "1".
 Dopo aver provato le diverse tecniche abbiamo deciso di creare le seguenti tre diverse versioni sbilanciate del training set utilizzando diverse tecniche di undersampling e oversempling: 
 \begin{enumerate}
-    \item \textbf{Undersampled:} la prima versione di data training è stata modificata attraverso una variante del modello "Near Neighbor", ovvero "Near Miss", decrementando così il numero di oggetti con valore "1" da 1729 fino a 198 record, e lasciando invariato il numero di record per il valore "0".
-    \item \textbf{Oversampled:} nel secondo abbiamo invece lasciato invariato il numero di oggetti con valore "1", ed incrementato il numero record per il valore "0" a 55904, in maniera tale che rappresentassero il 97\% del data training implementando il modello "SMOTE".
-    \item \textbf{Undersampled e Oversampled:} la composizione dell'ultimo è stata modificata completamente ottenendo la seguente composizione: 55031 oggetti per il valore "0" e 1702 per l' "1" attraverso l'implementazione delle seguenti tecniche: "Random OverSampler" e "Neighbourhood Cleaning Rule".
+    \item \textbf{Undersampled (che chiameremo \textit{dtU}):} la prima versione di data training è stata modificata attraverso una variante del modello "Near Neighbor", ovvero "Near Miss", decrementando così il numero di oggetti con valore "1" da 1729 fino a 198 record, e lasciando invariato il numero di record per il valore "0".
+    \item \textbf{Oversampled (che chiameremo \textit{dtO}):} nel secondo abbiamo invece lasciato invariato il numero di oggetti con valore "1", ed incrementato il numero record per il valore "0" a 55904, in maniera tale che rappresentassero il 97\% del data training implementando il modello "SMOTE".
+    \item \textbf{Undersampled e Oversampled (che chiameremo \textit{dtUO}):} la composizione dell'ultimo è stata modificata completamente ottenendo la seguente composizione: 55031 oggetti per il valore "0" e 1702 per l' "1" attraverso l'implementazione delle seguenti tecniche: "Random OverSampler" e "Neighbourhood Cleaning Rule".
 \end{enumerate}
 
 
@@ -375,8 +389,8 @@ Anche qui si è cercato di ottenere la migliore classificazione attraverso l'uso
 \end{tabular}
 \end{center}
 
-\noindent Le ultime due classificazioni hanno rispettivamente ottenuto nel primo test set una accuracy di 0.90994 e 0.91219, e nel secondo di 0.9477 e 0.96021. Non hanno quindi raggiunto il valore minimo accettabile. 
-Osserviamo quindi i valori ottenuti con la prima classificazione:
+\noindent Le classificazioni degli ultimi due training set (dtO e dtUO) hanno rispettivamente ottenuto nel primo test set una accuracy di 0.90994 e 0.91219, e nel secondo di 0.9477 e 0.96021. Non hanno quindi raggiunto il valore minimo accettabile. 
+Osserviamo quindi i valori ottenuti con la prima classificazione, quella su dtU:
 
 \begin{center}
 \begin{tabular}{ |l|l|l| }
@@ -395,7 +409,7 @@ Osserviamo quindi i valori ottenuti con la prima classificazione:
 \hline
 \end{tabular}
 \end{center}
-I valori ottenuti nel secondo test set sono estremamente positivi, ma comunque inferiori a quelli ottenuti con l'utilizzo dello stesso modello sul training originale.
+I valori ottenuti nel secondo test set sono estremamente positivi, tra i migliori, ma comunque inferiori a quelli ottenuti con l'utilizzo dello stesso modello sul training originale.
 Dai grafici sottostanti si può però osservare che nonostante l'accuracy del terzo training set sia inferiore a quella del primo quest'ultimo ha però un'aria sotto la curva maggiore in entrambi i test set. 
 
 \begin{figure}[H]
@@ -409,8 +423,8 @@ Dai grafici sottostanti si può però osservare che nonostante l'accuracy del te
 Questi due modelli hanno valori dell'accuracy  nei due test set che partono da 0.91219 e arrivano ad un valore massimo di 0.96021 e non vi è nulla di interessante di cui discutere, possiamo però notare che la combinazione di PCA e Logistic Regression ha ottenuto uno tra i migliori risultati, applicando invece lo stesso modello sul training sbilanciato con tre tecniche differenti non si riesce ad ottiene un risultato ottimale.
 
 \subsubsection*{Naive Bayes}
-Risultati interessanti sono stati ottenuti con il classificatore "Naive Bayes", questo modello non richiedeva nessun Iper-Parametro in input.  
-E' interessante osservare che i dataset che riescono ad ottenere utilizzando il modello 
+Risultati interessanti sono stati ottenuti con il classificatore "Naive Bayes", questo modello non richiedeva nessun Iper-Parametro in input quindi non si è ricorsi all'utilizzo del modello Randomized Search. Nella tabella sottostante è possibile osservare i risultati ottenuti dai tre data training.  
+
 \begin{center}
 \begin{tabular}{ |l|l|l| }
 \hline
@@ -424,37 +438,26 @@ E' interessante osservare che i dataset che riescono ad ottenere utilizzando il 
 \hline
 \end{tabular}
 \end{center}
-
+E' curioso osservare che i dataset che riescono ad ottenere risultati ottimali utilizzando questo classificatore sono i training maggiormente modificati (dtO e dtUO), che hanno ottenuto valori positivi dell'accuracy nei precedenti modelli, ma che non riuscivano a raggiungere il valore minimo accettabile. I due data training modificati ottengono i medesimi risultati nel primo test set, migliori rispetto a quelli ottenuti dal Decision Tree, ma la classificazione ottenuta dal training dtO ha prodotto dei valori migliori nel secondo test set, ma sopratutto è uno dei modelli con la maggiore AUC per entrambi i test set.  
 
 
 \begin{center}
-\begin{tabular}{ |l|l|l| }
+\begin{tabular}{ |l|l|l|l|l| }
+\hline & \multicolumn{2}{|c|}{ \textbf{Oversampled}} & \multicolumn{2}{|c|}{ \textbf{Under e Oversampled}}\\
+
 \hline
-& \textbf{Test Set 1} & \textbf{Test Set 2} \\
+& \textbf{Test Set 1} & \textbf{Test Set 2}& \textbf{Test Set 1} & \textbf{Test Set 2} \\
 \hline\hline \centering
-\textbf{Oversampled} & & \\
+\textit{Accuracy:} & 0.97711 & 0.98985 & 0.97711 & 0.97897\\
+\hline \centering
+\textit{F1-score:} & [0.98172, 0.96939] & [0.99354, 0.9762 ] & [0.98172, 0.96939] & [0.986746, 0.94922]\\ 
+\hline \centering
+\textit{Weighted Avg F1-score} & 0.98 & 0.99 & 0.98 & 0.98\\ 
 \hline
-\textit{Accuracy:} & 0.97711 & 0.98985 \\
+\textit{Precision:} & [1.00, 0.95] & [1.00, 0.96] & [1.00, 0.95] & [0.98, 0.96] \\ 
 \hline \centering
-\textit{F1-score:} & [0.98172, 0.96939] & [0.99354, 0.9762 ] \\ 
-\hline \centering
-\textit{Weighted Avg F1-score} & 0.98 & 0.99 \\ 
-\hline
-\textit{Precision:} & [1.00, 0.95] & [1.00, 0.96] \\ 
-\hline \centering
-\textit{Recall:} & [0.99, 0.99] & [0.99, 0.99] \\ 
-\hline
-\textbf{Undersampled e Oversampled} & & \\
-\hline
-\textit{Accuracy:} & 0.97711 & 0.97897 \\
-\hline \centering
-\textit{F1-score:} & [0.98172, 0.96939] & [0.986746, 0.94922] \\ 
-\hline \centering
-\textit{Weighted Avg F1-score} & 0.98 & 0.98 \\ 
-\hline
-\textit{Precision:} & [1.00, 0.95] & [0.98, 0.96] \\ 
-\hline \centering
-\textit{Recall:} & [0.97, 0.99] & [0.99, 0.94] \\ 
+\textit{Recall:} & [0.99, 0.99] & [0.99, 0.99] & [0.97, 0.99] & [0.99, 0.94]\\ 
+
 \hline
 \end{tabular}
 \end{center}
@@ -472,8 +475,18 @@ E' interessante osservare che i dataset che riescono ad ottenere utilizzando il 
 \section{Task 2}
 
 \subsection{Support Vector Machines (SVM)}
+\subsubsection{Linear SVM}
+Per prima cosa abbiamo valutato la qualità della classificazione attraverso il classificatore Linear SMV attraverso una rappresentazione grafica dei valori Precision e Recall che è possibile ottenere nei due test set con il variare delle diversi parametri, e il valore medio assunto dalla Precision (AP) che riassume il grafico stesso. Come è possibile vedere nel primo test set la curva presenta diversi e profondi picchi, invece la seconda curva è più lineare.
 
+\begin{figure}[H]
+  \centering
+  \subfloat[Precision-Recall curve per il primo test set.]{\includegraphics[width=0.385\textwidth]{SVM/PR1.png}\label{fig:auc1}}
+  \hspace{1.5cm}
+  \subfloat[Precision-Recall curve per il secondo test set.]{\includegraphics[width=0.385\textwidth]{SVM/PR2.png}\label{fig:auc22}}
+\end{figure}
 
+Successivamente abbiamo fatto diverse prove modificando i vari valori assunti dai parametri: penalty, loss, multi\_class, dual,fit\_intercept, tol e C.
+\subsubsection{SVC}
 \subsection{Ensemble Learning}
 
 \textbf{Random Forest}: I Decision Boundary tipici che hanno restituito i risultati più stabili, apprezzabili dal valore degli indici di validazione sul Training Set e dell'area AUC sul Test Set, sono stati quelli della Logistic Regression e Naive Bayes. Tramite la Random Forest è stato posto l'obiettivo di raggiungere quella stabilità, tramite un Decision Boundary analogo, insieme ad una performance sui Test Set pari a quella ottenuta con il Decision Tree. Lo scopo è stato raggiunto con un modello che ha per Iper-Parametri: 'max features'='log2', 'random state'=0, 'n estimators'=100', 'max depth'=3 e i valori di default per gli altri. Il valore migliore della 'max depth' è stato trovato mediante la Random Search cercando nel dominio [1,100] e ottimizzando per l'F1 Score. Il fatto che il 'max depth' ottimale sia un valore basso indica che sono sufficienti singoli alberi semplici non overfittati. Le feature diverse da 'Light' aumentano la loro importanza. Il Decision Boundary è più preciso per valori bassi di 'CO2'. Quando 'CO2' è basso 'Light' viene splittato ad un valore leggermente superiore a 365.125, come si nota dall'albero proposto quì (split a 371.125). In questo modo la zona di maggior contatto tra gli addensamenti delle due classi in output viene separata con più precisione.
@@ -488,7 +501,7 @@ E' interessante osservare che i dataset che riescono ad ottenere utilizzando il 
 \\
 
 
-\noindent \textbf{Bagging}: Il Bagging è stato eseguito con lo stesso scopo della Random Forest, con classificatori diversi dal Decision Tree: Support Vector Machine, Naive Bayes, Logistic regression. Particolare attenzione è stata riservata a quest'ultimo perché era stato il modello più stabile nella fase di classificazione di base. I risultati migliori in assoluto fino ad ora infatti vengono ottenuti con un Bagging composto da 50 Logistic Regression (non è stato necessario fittare nessun Iper-Parametro, il 'random state' è fissato a 0). A fronte degli stessi risultati della Random Forest sia per la Cross-Validation che per i test abbiamo quì i migliori valori dell'AUC.
+\noindent \textbf{Bagging}: Il Bagging è stato eseguito con lo stesso scopo della Random Forest, con classificatori diversi dal Decision Tree: Support Vector Machine, Naive Bayes, Logistic regression. Particolare attenzione è stata riservata a quest'ultimo perché era stato il modello più stabile nella fase di classificazione di base. I risultati migliori in assoluto fino ad ora infatti vengono ottenuti con un Bagging composto da 50 Logistic Regression (50 è il numero di base classifier minimo per raggiungere il risultato migliore). A fronte degli stessi risultati della Random Forest sia per la Cross-Validation che per i test abbiamo quì i migliori valori dell'AUC.
 
 \begin{figure}[H] \centering
 \includegraphics[width=7cm]{ensamble/ROC Curve Test 1 Bagging.png}
@@ -511,10 +524,60 @@ L'AdaBoost è stato utilizzato anche con un Naive Bayes Classifier che ha permes
 
 \subsection{Neural Networks and Deep Learning}
 
+\noindent \textbf{Single Layer Perceptron}: Gli iper-parametri usati per ottenere i risultati migliori con la  funzione Perceptron sono stati scelti usando la funzione CrossValidationCV con l’obiettivo di miglioramento della misura F1. Nonostante la ottimizazzione del modello raggiunta con alpha uguale a 0.0281 e penalty uguale a L1 (regressione lasso) , i risultati ottenuti non si sono mostrati i migliori (Figure1).
+\begin{wrapfigure}[9]{r}{0.5\textwidth}
+\includegraphics[width=12cm]{NN/figure 1.png}
+\end{wrapfigure}
+
+
+\noindent \textbf{Multi Layer Perceptron}: Dopo multiple prove e sperimenti con i vari iper-parametri per multi layer perceptron, sono state scoperte parecchie cose interessanti. Ad esempio, se ci sono solo due hidden layer, non cambia molto i risultati se il primo layer è settato a 100 o a 200, o se il secondo è settato a 50 o a 90. 
+Una delle prime prove con MLP era quella di settare il primo layer a 100, il secondo a 50, e il terzo a 25, scegliendo Adam come solver, l’alpha di 0.0001 la learning rate adattiva, e la funzione di attivazione tangente iperbolica con momentum di 0.9. Mentre la Loss usciva abbastanza bassa (0.01868), l’accuracy e F1 (0.92908 e 0.9457, 0.89778, rispettivamente)  invece usciva molto di meglio con rispetto alla Single Layer Perceptron, però molto di peggio con rispetto ai risultati migliori ottenuti finora con gli altri classifier.
+Dopo tante prove, I risultati invece si sono migliorati scegliendo Stochastic Gradient Descent come solver al posto di adam, e riducendo il numero dei strati a 2, cioè, 100 e 50 per evitare l’overfitting della dataset. Un’altra cosa fatta con lo stesso scopo era alzare l’alpha che si aggiunge alla loss function a 0.01 per ‘penalizzare’ il modello per l’overfitting. Abbiamo di nuovo scelto L2 (lasso regression).  Nonostante l’alzamento della Loss corrente al 0.05 con rispetto al modello precedente, l’accuracy invece è saltata a 0.9786  e le misure F1 a 0.9829 e 0.97124, rispettivamente per la variabile indipendente (‘Occupancy’) di 0 e 1. Il grafico della loss function può essere osservato nella figura 2. 
+
+\begin{figure}[H]\centering
+\includegraphics[width=9cm]{NN/Figure 2.png}
+\end{figure}
+
 
 \section{Task 3}
 
+Come dataset per questo task è stato usato il Training Set fornito. L'attributo 'date' è costituito da valori del tempo rilevati ogni minuto ma sono presenti diversi valori dove anziché all'istante del minuto preciso è stato osservato il valore un secondo prima (es. 17:51:59 anziché 17:52:00). Si tratta di un piccolo chiaro errore di rilevazione e quindi affinché le serie temporali generate risultassero coerenti tutti i valori con 59 secondi sono stati corretti mediante il loro Offset di 1 secondo in avanti.
+
 \subsection{Forecasting}
+
+Sono state osservate graficamente tutte le Time Series di ciascun attributo del dataset e quella che è stata scelta per eseguire questo task, perché risultata la più interessante, è stata quella relativa all'attributo 'Temperature'.
+
+\begin{wrapfigure}[12]{r}{0.5\textwidth}
+\includegraphics[width=10cm]{forecast/TS Temperature.png}
+\end{wrapfigure}
+
+\noindent La serie temporale presenta un leggero trend discendente dall'inizio fino al giorno 2015-02-08. Successivamente sembra stabilizzarsi o addirittura cominciare un inversione di trend. E' presente un'evidente stagionalità che si ripete ogni 1440 minuti, cioè esattamente ogni giorno. Ciò è dovuto all'escursione termica tra il giorno e la notte: è evidente anche in questo grafico che le temperature minime si hanno nelle ore notturne. La varianza della serie rimane abbastanza stabile al variare del tempo, ma per alcune giornate la differenza termica è importante, ad esempio tra il 2015-02-07 ed il 2015-02-08. Il Dickey-Fuller Test per la verifica della stazionarietà indica che la serie non è propriamente stazionaria: Test Statistic = -2.69; Critical Value (1\%) = -3.43; Critical Value (5\%) = -2.86; Critical Value (10\%) = -2.57. E' stato deciso quindi di renderla stazionaria riducendo la varianza ed eliminando il trend. La varianza è stata ridotta mediante una trasformazione logaritmica della Time Series (ciascun valore diventa il logaritmo naturale del valore originale) ed il trend è stato eliminato sottraendo a ciascun valore la media mobile a 300 periodi (cioè il valore medio della temperatura nelle 5 ore precedenti). La nuova serie è stazionaria: il Test Statistics del Dickey-Fuller Test passa a -3.88, inferiore a tutti i Critical Value per ogni confidenza (già riportati sopra). Dal grafico della Partial Autocorrelation si intuisce che la serie potrebbe essere approssimata da un modello autoregressivo a 4 periodi.
+
+
+\begin{figure}[H]\centering
+\includegraphics[width=9cm]{forecast/TS Temperature Stationary.png}
+\includegraphics[width=8cm]{forecast/TS Temperature PACF.png}
+\end{figure}
+
+\noindent Per effettuare il forecasting la TS è stata suddivisa tenendo i primi 6129 valori come training e i successivi come test. In questo modo il test set comincerà esattamente alla mezzanotte del 2015-02-09.
+\\
+
+\noindent \textbf{Exponential Smoothing}: Data la stagionalità accentuata è stato prodotto un modello basato su 1440 periodi (1 giorno in minuti) in modo da catturare il pattern tipico della temperatura giornaliera.
+
+\begin{figure}[H]\centering
+\includegraphics[width=16cm]{forecast/Exponential Smoothing Forecast.png}
+\end{figure}
+
+\begin{center}
+\begin{tabular}{ | m{2cm} | m{2cm}| m{2cm} | m{2cm}| m{2cm} | m{2cm}| m{2cm} | } 
+\hline
+R2 & MAE & MAD & MAPE & MAXAPE & TAPE\\
+\hline\hline \centering
+0.7698 & 0.0101 & 0.0078 & 1.24 & 62.82 & 2130.31 \\
+\hline
+\end{tabular}
+\end{center}
+
 
 
 \section{Task 4}
