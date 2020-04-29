@@ -1,8 +1,10 @@
 Exploit the temporal information of the dataset preparing it for a univariate framework of analysis,
 i.e. select a feature and use it as your time series. You are welcome in using more than one reliable temporal
 split to have more time series of the same feature. You are welcome in creating more than a dataset using more than
-a feature and report the result on the feature you prefer or more than one. Analyze such datasets for finding motifs
-and/or anomalies and shaplets. Visualize and discuss them and their relationship with the class of the time series.
+a feature and report the result on the feature you prefer or more than one.
+
+Analyze such datasets for finding motifs and/or anomalies and shaplets.
+Visualize and discuss them and their relationship with the class of the time series.
 
 
 On the dataset(s) created, compute clustering based on Euclidean/Manhattan and DTW distances and compare the results.
