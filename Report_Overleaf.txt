@@ -31,6 +31,9 @@
 %\usepackage{chngcntr}
 %\counterwithin{table}{section}
 
+\usepackage{multicol}
+
+
 \title{Report Data Mining II}
 \author{Ferri Lorenzo (607828) \\ email \href{mailto:lorenzoferri1995@gmail.com}{lorenzoferri1995@gmail.com} \and Pappolla Roberta (534109) \\ email
  \href{mailto:r.pappolla@studenti.unipi.it}{r.pappolla@studenti.unipi.it} \and Ema Ilic (602796) \\ email \href{mailto:e.ilic@studenti.unipi.it}{e.ilic@studenti.unipi.it}}
@@ -476,18 +479,74 @@ E' curioso osservare che i dataset che riescono ad ottenere risultati ottimali u
 
 \subsection{Support Vector Machines (SVM)}
 \subsubsection{Linear SVM}
-Per prima cosa abbiamo valutato la qualità della classificazione attraverso il classificatore Linear SMV attraverso una rappresentazione grafica dei valori Precision e Recall che è possibile ottenere nei due test set con il variare delle diversi parametri, e il valore medio assunto dalla Precision (AP) che riassume il grafico stesso. Come è possibile vedere nel primo test set la curva presenta diversi e profondi picchi, invece la seconda curva è più lineare.
+Per cominciare abbiamo fatto diverse prove assegnando diversi valori ai seguenti parametri: penalty, loss, multi\_class, dual, fit\_intercept, tol e C. Provando le diverse combinazioni di questi è possibile notare che, diversamente da quello che accadeva con i classificatori precedentemente utilizzati, è più facile ottenere valori dell'accuracy più alti nel primo test set rispetto che nel secondo.\\
+Le migliori combinazione di questi parametri sono state trovate attraverso la Randomized Search, c'è da notare che quella che ottiene il miglior valore di accuracy per il primo test set ne ottiene uno meno buono nel secondo: 1) 0.9793621013133208, miglior valore dell'accuracy ottenuto rispetto quello ottenuto classificando il training set con il Decision Tree per questo test set; 2) 0.815935192780968, con una Precision per il valore "1" di 0.53. Visto i risultati non proprio ottimali ottenuti nel secondo test set si è optato per un'altra combinazione dei parametri, più precisamente diverse combinazioni di parametri, che ottengono i seguenti risultati:
+
+
+\begin{center}
+\begin{tabular}{ |l|l|l| }
+\hline
+& \textbf{Test Set 1} & \textbf{Test Set 2} \\
+\hline\hline \centering
+\textit{Accuracy:} & 0.97899 & 0.98359 \\
+\hline \centering
+\textit{F1-score:} & [0.98319, 0.97197] & [0.9895, 0.96232] \\ 
+\hline \centering
+\textit{Weighted Avg F1-score} & 0.98 & 0.98 \\ 
+\hline
+\textit{Precision:} & [1.00, 0.95] & [1.00, 0.93] \\ 
+\hline \centering
+\textit{Recall:} & [0.97, 1.00] & [0.98, 1.00] \\ 
+\hline
+\end{tabular}
+\end{center}
+Qui di seguito vi è una rappresentazione grafica dei valori Precision e Recall che è possibile ottenere nei due test set variando le soglie , e il rispettivo valore medio assunto dalla Precision (AP) che riassume il grafico stesso. Questo ci aiuta a comprendere la qualità della classificazione ottenuta. Come è possibile vedere nel primo test set la curva presenta diversi e profondi picchi, invece la seconda curva è più lineare.
 
 \begin{figure}[H]
   \centering
-  \subfloat[Precision-Recall curve per il primo test set.]{\includegraphics[width=0.385\textwidth]{SVM/PR1.png}\label{fig:auc1}}
-  \hspace{1.5cm}
-  \subfloat[Precision-Recall curve per il secondo test set.]{\includegraphics[width=0.385\textwidth]{SVM/PR2.png}\label{fig:auc22}}
+  \subfloat[P-R curve per il primo test set.]{\includegraphics[width=0.35\textwidth]{SVM/PR1.png}\label{fig:auc1}}
+  \subfloat[P-R curve per il secondo test set.]{\includegraphics[width=0.35\textwidth]{SVM/PR2.png}\label{fig:auc22}}
+  \subfloat[Soluzione grafica PCA.]{\includegraphics[width=0.35\textwidth]{{SVM/graphsol.png}}\label{fig:auc22}}
+
 \end{figure}
 
-Successivamente abbiamo fatto diverse prove modificando i vari valori assunti dai parametri: penalty, loss, multi\_class, dual,fit\_intercept, tol e C.
+Per avere un'idea grafica della soluzione scelta si è deciso di applicare il medesimo modello al training trasformato attraverso la PCA, il quale otteneva risultati simili, che è possibile osservare qui sopra.
+
+
+
 \subsubsection{SVC}
+Nei risultati ottenuti con la classificazione Nonlinear SVM è ancora più accentuata la differenza di risultati dell'accuracy tra il primo test set e il secondo, è possibile ottenere risultati estremamente positivi nel primo test set, e altrettanto negativi nel secondo (ES: 1)0.9973733583489681 2) 0.34290401968826906). Un risultato molto interessante è stato trovato assegnando i seguenti valori ai parametri: C=1, tol=0.01, gamma=100, class\_weight='balanced', random\_state=42, con questi parametri è possibile classificare perfettamente il primo test set, e sufficientemente bene il secondo, l'unico problema è che nel secondo test vi è una Precision per il valore "1" di 0, i risultati ottenuti sono i seguenti:
+
+\begin{center}
+\begin{tabular}{ |l|l|l| }
+\hline
+& \textbf{Test Set 1} & \textbf{Test Set 2} \\
+\hline\hline \centering
+\textit{Accuracy:} & 1 & 0.78989 \\
+\hline \centering
+\textit{F1-score:} & [1.00, 1.00] & [0.88261, 0.00] \\ 
+\hline \centering
+\textit{Weighted Avg F1-score} & 1.00 & 0.70 \\ 
+\hline
+\textit{Precision:} & [1.00,1.00] & [0.79, 0.00] \\ 
+\hline \centering
+\textit{Recall:} & [1.00, 1.00] & [1.00, 0.00] \\ 
+\hline
+\end{tabular}
+\end{center}
+Altrettanto interessanti sono le curve Precision-Recall derivanti da questa classificazione per i due test set: 
+
+\begin{figure}[H]
+  \centering
+  \subfloat[P-R curve per il primo test set.]{\includegraphics[width=0.385\textwidth]{SVM/PR1-2.png}\label{fig:auc1}}
+  \hspace{1.5cm}
+  \subfloat[P-R curve per il secondo test set.]{\includegraphics[width=0.385\textwidth]{SVM/PR2-2.png}\label{fig:auc22}}
+\end{figure}
+ \noindent Stiamo ancora lavorando per trovare la miglior combinazione dei valori dei parametri per questa classificazione in maniera tale che ottenga ottimi risultati in entrambi i test set con l'utilizzo della Randomized Search.
+
 \subsection{Ensemble Learning}
+
+
 
 \textbf{Random Forest}: I Decision Boundary tipici che hanno restituito i risultati più stabili, apprezzabili dal valore degli indici di validazione sul Training Set e dell'area AUC sul Test Set, sono stati quelli della Logistic Regression e Naive Bayes. Tramite la Random Forest è stato posto l'obiettivo di raggiungere quella stabilità, tramite un Decision Boundary analogo, insieme ad una performance sui Test Set pari a quella ottenuta con il Decision Tree. Lo scopo è stato raggiunto con un modello che ha per Iper-Parametri: 'max features'='log2', 'random state'=0, 'n estimators'=100', 'max depth'=3 e i valori di default per gli altri. Il valore migliore della 'max depth' è stato trovato mediante la Random Search cercando nel dominio [1,100] e ottimizzando per l'F1 Score. Il fatto che il 'max depth' ottimale sia un valore basso indica che sono sufficienti singoli alberi semplici non overfittati. Le feature diverse da 'Light' aumentano la loro importanza. Il Decision Boundary è più preciso per valori bassi di 'CO2'. Quando 'CO2' è basso 'Light' viene splittato ad un valore leggermente superiore a 365.125, come si nota dall'albero proposto quì (split a 371.125). In questo modo la zona di maggior contatto tra gli addensamenti delle due classi in output viene separata con più precisione.
 
@@ -539,46 +598,122 @@ Dopo tante prove, I risultati invece si sono migliorati scegliendo Stochastic Gr
 \end{figure}
 
 
+
+
+% SECONDA DELIVERY
+
+
+
+
+\newpage
+
 \section{Task 3}
 
-Come dataset per questo task è stato usato il Training Set fornito. L'attributo 'date' è costituito da valori del tempo rilevati ogni minuto ma sono presenti diversi valori dove anziché all'istante del minuto preciso è stato osservato il valore un secondo prima (es. 17:51:59 anziché 17:52:00). Si tratta di un piccolo chiaro errore di rilevazione e quindi affinché le serie temporali generate risultassero coerenti tutti i valori con 59 secondi sono stati corretti mediante il loro Offset di 1 secondo in avanti.
+L'attributo 'date' è costituito da valori del tempo rilevati ogni minuto ma sono presenti diversi valori dove anziché all'istante del minuto preciso è stato osservato il valore un secondo prima (es. 17:51:59 anziché 17:52:00). Si tratta di un piccolo chiaro errore di rilevazione che potrebbe inficiare l'analisi sulle serie temporali e quindi tutti i valori con 59 secondi sono stati corretti mediante il loro Offset di 1 secondo in avanti, sia nel Training che nei due Test Set. Il primo Test Set contiene rilevazioni temporalmente precedenti al Training ed il secondo Test Set rilevazioni successive. Il termine del primo Test Set non coincide con l'inizio del Training e la fine di quest'ultimo non coincide con l'inizio del secondo Test (ci sono diverse ore di distanza tra i tre). Per questo non è stato possibile unire i tre dataset in un unico più grande che sarebbe potuto servire per le analisi sulle singole Time Series, che sono state dunque eseguite sul Training Set. % Comunque si riporta quì il grafico della Time Series composta dai tre dataset, dove i valori mancanti sono stati posti pari all'ultimo valore disponibile, approssimata mediante la tecnica che è risultata migliore, la .......
 
 \subsection{Forecasting}
 
-Sono state osservate graficamente tutte le Time Series di ciascun attributo del dataset e quella che è stata scelta per eseguire questo task, perché risultata la più interessante, è stata quella relativa all'attributo 'Temperature'.
+Sono state osservate tutte le Time Series di ciascun attributo ed è stata scelta quella relativa all'attributo 'Temperature' per eseguire questo task. La serie temporale presenta un leggero trend discendente dall'inizio fino al giorno 2015-02-08. Successivamente sembra stabilizzarsi o addirittura cominciare un'inversione di trend. E' presente un'evidente stagionalità che si ripete ogni 1440 minuti, cioè esattamente ogni giorno. Ciò è dovuto all'escursione termica tra il giorno e la notte: è evidente anche nel grafico che le temperature minime si hanno nelle ore notturne. 
 
-\begin{wrapfigure}[12]{r}{0.5\textwidth}
-\includegraphics[width=10cm]{forecast/TS Temperature.png}
+\begin{wrapfigure}[11]{r}{0.5\textwidth}
+\includegraphics[width=9cm]{forecast/TS Temperature.png}
 \end{wrapfigure}
 
-\noindent La serie temporale presenta un leggero trend discendente dall'inizio fino al giorno 2015-02-08. Successivamente sembra stabilizzarsi o addirittura cominciare un inversione di trend. E' presente un'evidente stagionalità che si ripete ogni 1440 minuti, cioè esattamente ogni giorno. Ciò è dovuto all'escursione termica tra il giorno e la notte: è evidente anche in questo grafico che le temperature minime si hanno nelle ore notturne. La varianza della serie rimane abbastanza stabile al variare del tempo, ma per alcune giornate la differenza termica è importante, ad esempio tra il 2015-02-07 ed il 2015-02-08. Il Dickey-Fuller Test per la verifica della stazionarietà indica che la serie non è propriamente stazionaria: Test Statistic = -2.69; Critical Value (1\%) = -3.43; Critical Value (5\%) = -2.86; Critical Value (10\%) = -2.57. E' stato deciso quindi di renderla stazionaria riducendo la varianza ed eliminando il trend. La varianza è stata ridotta mediante una trasformazione logaritmica della Time Series (ciascun valore diventa il logaritmo naturale del valore originale) ed il trend è stato eliminato sottraendo a ciascun valore la media mobile a 300 periodi (cioè il valore medio della temperatura nelle 5 ore precedenti). La nuova serie è stazionaria: il Test Statistics del Dickey-Fuller Test passa a -3.88, inferiore a tutti i Critical Value per ogni confidenza (già riportati sopra). Dal grafico della Partial Autocorrelation si intuisce che la serie potrebbe essere approssimata da un modello autoregressivo a 4 periodi.
-
+\noindent La varianza della serie rimane abbastanza stabile al variare del tempo, ma per alcune giornate la differenza termica è importante, ad esempio tra il 2015-02-07 ed il 2015-02-08. Il Dickey-Fuller Test per la verifica della stazionarietà indica che la serie non è propriamente stazionaria: Test Statistic = -2.69; Critical Value (1\%) = -3.43; Critical Value (5\%) = -2.86; Critical Value (10\%) = -2.57. E' stato quindi deciso di generare un'altra serie rendendo stazionaria quella iniziale, al fine di usarla per i modelli che necessitino della stazionarietà. La varianza è stata ridotta mediante una trasformazione logaritmica della Time Series (ciascun valore diventa il logaritmo naturale del valore originale) ed il trend è stato eliminato sottraendo a ciascun valore la media mobile a 300 periodi (cioè il valore medio della temperatura nelle 5 ore precedenti). La nuova serie è stazionaria: il Test Statistics del Dickey-Fuller Test passa a -3.88, inferiore a tutti i Critical Value per ogni confidenza (già riportati sopra). Dal grafico della Partial Autocorrelation della serie si intuisce che essa potrebbe essere approssimata da un modello autoregressivo di ordine 4.
 
 \begin{figure}[H]\centering
 \includegraphics[width=9cm]{forecast/TS Temperature Stationary.png}
-\includegraphics[width=8cm]{forecast/TS Temperature PACF.png}
+\includegraphics[width=7cm]{forecast/TS Temperature PACF.png}
 \end{figure}
 
-\noindent Per effettuare il forecasting la TS è stata suddivisa tenendo i primi 6129 valori come training e i successivi come test. In questo modo il test set comincerà esattamente alla mezzanotte del 2015-02-09.
-\\
+\noindent Per effettuare il forecasting la TS è stata suddivisa tenendo i primi 6129 valori come training e i successivi come test. In questo modo il test set comincia esattamente alla mezzanotte del 2015-02-09. \newline
 
-\noindent \textbf{Exponential Smoothing}: Data la stagionalità accentuata è stato prodotto un modello basato su 1440 periodi (1 giorno in minuti) in modo da catturare il pattern tipico della temperatura giornaliera.
+\noindent \textbf{Simple Exponential Smoothing}: Essendo presente una chiara stagionalità il SES non può produrre una buona predizione. In ogni caso il modello è stato applicato sulla serie resa stazionaria facendo variare il valore dell'Iper-Parametro Alpha (lo Smoothing Level) nel range [0,1]. I risultati non variano molto, in generale la predizione graficamente risulta essere una semplice retta parallela, molto vicina alla media storica della TS. Infatti i Coefficienti di Determinazione sono vicini a 0 (un valore di R2 pari a 0 indica che il modello ha una Performance esattamente pari alla media). \newline
 
-\begin{figure}[H]\centering
-\includegraphics[width=16cm]{forecast/Exponential Smoothing Forecast.png}
-\end{figure}
+\noindent \textbf{Holt's Linear Trend method}: 
 
-\begin{center}
-\begin{tabular}{ | m{2cm} | m{2cm}| m{2cm} | m{2cm}| m{2cm} | m{2cm}| m{2cm} | } 
+\begin{wrapfigure}[6]{r}{0.5\textwidth}
+\includegraphics[width=9cm]{forecast/Holt Forecast.png}
+\end{wrapfigure}
+
+\noindent Anche questo metodo non produce buone predizioni su dati con stagionalità ma permette Forecast più accurati su dati con trend, quindi è stato testato sulla Time Series originale non stazionaria. Con valori degli Iper-Parametri Smoothing Level = 0.01 e Smoothing Slope = 0.1 riesce a catturare l'inversione di trend nella parte finale della TS. Il coefficiente R2 è comunque ancora vicino a 0. \newline
+
+\noindent \textbf{ARIMA}: Come suggerito dal grafico della PACF il miglior modello ARIMA per i dati ha Autoregressione di ordine 4 e Media Mobile di ordine 1: ARIMA(4, 0, 1). Nonostante il modello ARIMA funzioni solo su serie stazionarie e non predica la stagionalità, esso riesce a catturare molto bene l'inversione di trend e un accenno di stagionalità sulla serie originale (va tenuto presente che anche la serie originale è abbastanza stazionaria). In questi termini il modello predice dove si sposterà la media della serie e con che velocità lo farà.
+
+\begin{tabular}{ m{3.5cm} m{0cm} }
+
+\begin{tabular}{ | m{1.7cm} | m{1.2cm} | } 
 \hline
-R2 & MAE & MAD & MAPE & MAXAPE & TAPE\\
-\hline\hline \centering
-0.7698 & 0.0101 & 0.0078 & 1.24 & 62.82 & 2130.31 \\
+R2 & 0.3479 \\
+\hline
+MAPE & 0.0295 \\
+\hline
+MAXAPE & 0.0744 \\
+\hline
+TAPE & 59.479 \\
 \hline
 \end{tabular}
-\end{center}
+
+&
+
+\begin{figure}[H]
+\includegraphics[width=11cm]{forecast/ARIMA Forecast.png}
+\end{figure}
+
+\end{tabular}
+
+\noindent 
+
+\noindent \textbf{Exponential Smoothing}: Data l'accentuata stagionalità nei dati, con periodi giornalieri, è stato prodotto un modello basato su 1440 periodi (1 giorno in minuti), in modo da catturare il pattern tipico della temperatura giornaliera. I risultati dell'Exponential Smoothing stagionale sono i migliori tra i modelli testati.
+
+\begin{tabular}{ m{3.5cm} m{0cm} }
+
+\begin{tabular}{ | m{1.7cm} | m{1.2cm} | } 
+\hline
+R2 & 0.7698 \\
+\hline
+MAPE & 1.24 \\
+\hline
+MAXAPE & 62.82 \\
+\hline
+TAPE & 2130.31 \\
+\hline
+RMSE & 0.013 \\
+\hline
+MAE & 0.0101 \\
+\hline
+MAD & 0.0078 \\
+\hline
+\end{tabular}
+
+&
+
+\begin{figure}[H]
+\includegraphics[width=13.5cm]{forecast/Exponential Smoothing Forecast.png}
+\end{figure}
+
+\end{tabular}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Time Series Classification}
+
+\noindent \textbf{Shaplet based classifier}:
+
+\noindent \textbf{Convolutional Neural Network}:
+
+\noindent \textbf{Recurrent Neural Network}:
 
 \section{Task 4}
 
