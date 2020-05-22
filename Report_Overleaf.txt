@@ -52,7 +52,7 @@
 \pagenumbering{arabic} %conversione in numeri arabi
 
 
-\section{Task 1}
+\section{Task 1 - Basic Classifiers and Evaluation}
 
 \subsection{Data Understanding and Preparation}
 
@@ -475,12 +475,12 @@ E' curioso osservare che i dataset che riescono ad ottenere risultati ottimali u
 \end{figure}
 
 
-\section{Task 2}
+\section{Task 2 - Advanced Classifiers and Evaluation}
 
 \subsection{Support Vector Machines (SVM)}
 \subsubsection{Linear SVM}
 Per cominciare abbiamo fatto diverse prove assegnando diversi valori ai seguenti parametri: penalty, loss, multi\_class, dual, fit\_intercept, tol e C. Provando le diverse combinazioni di questi è possibile notare che, diversamente da quello che accadeva con i classificatori precedentemente utilizzati, è più facile ottenere valori dell'accuracy più alti nel primo test set rispetto che nel secondo.\\
-Le migliori combinazione di questi parametri sono state trovate attraverso la Randomized Search, c'è da notare che quella che ottiene il miglior valore di accuracy per il primo test set ne ottiene uno meno buono nel secondo: 1) 0.9793621013133208, miglior valore dell'accuracy ottenuto rispetto quello ottenuto classificando il training set con il Decision Tree per questo test set; 2) 0.815935192780968, con una Precision per il valore "1" di 0.53. Visto i risultati non proprio ottimali ottenuti nel secondo test set si è optato per un'altra combinazione dei parametri, più precisamente diverse combinazioni di parametri, che ottengono i seguenti risultati:
+Le migliori combinazione di questi parametri sono state trovate attraverso la Randomized Search, c'è da notare che quella che ottiene il miglior valore di accuracy per il primo test set ne ottiene uno meno buono nel secondo: 1) 0.97936, miglior valore dell'accuracy ottenuto rispetto quello ottenuto classificando il training set con il Decision Tree per questo test set; 2) 0.81593, con una Precision per il valore "1" di 0.53. Visto i risultati non proprio ottimali ottenuti nel secondo test set si è optato per un'altra combinazione dei parametri, più precisamente diverse combinazioni di parametri, che ottengono i seguenti risultati:
 
 
 \begin{center}
@@ -500,7 +500,7 @@ Le migliori combinazione di questi parametri sono state trovate attraverso la Ra
 \hline
 \end{tabular}
 \end{center}
-Qui di seguito vi è una rappresentazione grafica dei valori Precision e Recall che è possibile ottenere nei due test set variando le soglie , e il rispettivo valore medio assunto dalla Precision (AP) che riassume il grafico stesso. Questo ci aiuta a comprendere la qualità della classificazione ottenuta. Come è possibile vedere nel primo test set la curva presenta diversi e profondi picchi, invece la seconda curva è più lineare.
+Qui di seguito vi è una rappresentazione grafica dei valori Precision e Recall che è possibile ottenere nei due test set variando le soglie che riassume il grafico stesso, ed il rispettivo valore medio ponderato con l'aumento del recall dalla precedente soglia utilizzata come peso, assunto dalla Precision  (\textbf{AP}). Questo ci aiuta a comprendere la qualità della classificazione ottenuta. Come è possibile vedere nel primo test set la curva presenta diversi e profondi picchi, invece la seconda curva è più lineare. Possiamo affermare che i risultati ottenuti sono ottimi in quanto le accuracy ottenete nei due test set sono leggermente superiori al AP (0.9789 > 0.9738 e 0.98359 > 0.9756) e abbiamo anche ottenuto alti valori di Precision e Recall, cosa non scontata nel primo testset. Considerando che non sappiamo le combinazioni di risultati ottenibili tra i due testset siamo soddisfatti della classificazione ottenuta.
 
 \begin{figure}[H]
   \centering
@@ -515,7 +515,8 @@ Per avere un'idea grafica della soluzione scelta si è deciso di applicare il me
 
 
 \subsubsection{SVC}
-Nei risultati ottenuti con la classificazione Nonlinear SVM è ancora più accentuata la differenza di risultati dell'accuracy tra il primo test set e il secondo, è possibile ottenere risultati estremamente positivi nel primo test set, e altrettanto negativi nel secondo (ES: 1)0.9973733583489681 2) 0.34290401968826906). Un risultato molto interessante è stato trovato assegnando i seguenti valori ai parametri: C=1, tol=0.01, gamma=100, class\_weight='balanced', random\_state=42, con questi parametri è possibile classificare perfettamente il primo test set, e sufficientemente bene il secondo, l'unico problema è che nel secondo test vi è una Precision per il valore "1" di 0, i risultati ottenuti sono i seguenti:
+Invece per l'analisi effettuata attraverso la Non Linear SVC si è cercata la miglior combinazione tra le variabili C, kernel, tol, degree (per kernel='poly'), gamma e decision function shape.
+Nei risultati ottenuti con la classificazione NLSVM è ancora più accentuata la differenza di risultati dell'accuracy tra il primo test set e il secondo, è possibile ottenere risultati estremamente positivi nel primo test set, e altrettanto negativi nel secondo (ES: 1)0.9973733583489681 2) 0.34290401968826906). Un risultato molto interessante è stato trovato assegnando i seguenti valori ai parametri: C=1, tol=0.01, gamma=100, class\_weight='balanced', random\_state=42, con questi parametri è possibile classificare perfettamente il primo test set, e sufficientemente bene il secondo, l'unico problema è che nel secondo test vi è una Precision per il valore "1" di 0, i risultati ottenuti sono i seguenti:
 
 \begin{center}
 \begin{tabular}{ |l|l|l| }
@@ -542,7 +543,35 @@ Altrettanto interessanti sono le curve Precision-Recall derivanti da questa clas
   \hspace{1.5cm}
   \subfloat[P-R curve per il secondo test set.]{\includegraphics[width=0.385\textwidth]{SVM/PR2-2.png}\label{fig:auc22}}
 \end{figure}
- \noindent Stiamo ancora lavorando per trovare la miglior combinazione dei valori dei parametri per questa classificazione in maniera tale che ottenga ottimi risultati in entrambi i test set con l'utilizzo della Randomized Search.
+ \noindent Grazie alla Randomized search abbiamo trovato la miglior classificazione per il testset1 ma che non ottiene un buon risultato nel secondo. Il miglior risultato è stato ottenuto cambiando i parametri manualmente. Per prima cosa è interessante notare che con entrambi i classificatori (Linear e NonLine) non è possibile ottenere una accuracy maggiore di 0.9789868667917448 nel primo testset, che ottenga buoni risultati anche nel secondo. La miglior classificazione e stata ottenuta con i seguenti parametri: C=1.65, kernel= 'poly', tol= 0.3, degree=1,gamma='scale',decision\_function\_shape='ovr'. I risultati sono ottimi e ottengono una accuracy maggiorare dall'AP (= 0.969720 e 0.974440), e sono i seguenti:
+
+\begin{center}
+\begin{tabular}{ |l|l|l| }
+\hline
+& \textbf{Test Set 1} & \textbf{Test Set 2} \\
+\hline\hline \centering
+\textit{Accuracy:} & 0.97899 & 0.98605 \\
+\hline \centering
+\textit{F1-score:} & [0.98319 0.97197] & [0.99110 0.96774] \\ 
+\hline \centering
+\textit{Weighted Avg F1-score} & 0.98 & 0.99 \\ 
+\hline
+\textit{Precision:} & [1.00, 0.95] & [1.00, 0.94] \\ 
+\hline \centering
+\textit{Recall:} & [0.97, 1.00] & [0.98, 1.00] \\ 
+\hline
+\end{tabular}
+\end{center}
+\noindent Le due Precision-Recall che si ottengono sono quasi uguali a quelle ottenute nella LSVM quindi è inutile mostrarle. I due classificatori individuati ottengono risultati molto simili: uguali nel primo testset ma si differenziano nel secondo in quanto con la NLSVM ottiene valori maggiori per tutti gli indici di performance.
+
+\noindent \textbf{Decision Boundary}
+Abbiamo ottenuto i seguenti grafici utilizzando il training set modificato attraverso la tecninca della PCA. Possiamo affermare che per individuare la miglior Decision Boundary ottenuta bisogna verificare quale ha il margine maggiore, per margine si intenda la distanza tra il confine delle "zone" di decisione e il primo elemento appartenente alla relativa zona. Per questo pensiamo che la miglior soluzione grafica si ottiene con il modello Linear in quanto vi è una certo margine (nonostante vi sia visivamente un maggior errore di classificazione), invece nell'altro modello questo margine è inesistente poiché sono presenti record classificati per entrambi i valori sul confine stesso. 
+\begin{figure}[H]
+  \centering
+  \subfloat[Decision Boundary Linear SVM per testset 1.]{\includegraphics[width=0.385\textwidth]{SVM/LDB.png}\label{fig:db}}
+  \hspace{1.5cm}
+  \subfloat[Decision Boundary Non Linear SVM per testset1.]{\includegraphics[width=0.385\textwidth]{SVM/NLDB.png}\label{fig:db2}}
+\end{figure}
 
 \subsection{Ensemble Learning}
 
@@ -603,13 +632,9 @@ Dopo tante prove, I risultati invece si sono migliorati scegliendo Stochastic Gr
 % SECONDA DELIVERY
 
 
+\section{Task 3 - Time Series Analysis and Forecasting/Classification}
 
-
-\newpage
-
-\section{Task 3}
-
-L'attributo 'date' è costituito da valori del tempo rilevati ogni minuto ma sono presenti diversi valori dove anziché all'istante del minuto preciso è stato osservato il valore un secondo prima (es. 17:51:59 anziché 17:52:00). Si tratta di un piccolo chiaro errore di rilevazione che potrebbe inficiare l'analisi sulle serie temporali e quindi tutti i valori con 59 secondi sono stati corretti mediante il loro Offset di 1 secondo in avanti, sia nel Training che nei due Test Set. Il primo Test Set contiene rilevazioni temporalmente precedenti al Training ed il secondo Test Set rilevazioni successive. Il termine del primo Test Set non coincide con l'inizio del Training e la fine di quest'ultimo non coincide con l'inizio del secondo Test (ci sono diverse ore di distanza tra i tre). Per questo non è stato possibile unire i tre dataset in un unico più grande che sarebbe potuto servire per le analisi sulle singole Time Series, che sono state dunque eseguite sul Training Set. % Comunque si riporta quì il grafico della Time Series composta dai tre dataset, dove i valori mancanti sono stati posti pari all'ultimo valore disponibile, approssimata mediante la tecnica che è risultata migliore, la .......
+L'attributo 'date' è costituito da valori del tempo rilevati ogni minuto ma sono presenti diversi valori dove anziché all'istante del minuto preciso è stato osservato il valore un secondo prima (es. 17:51:59 anziché 17:52:00). Si tratta di un piccolo chiaro errore di rilevazione che potrebbe inficiare l'analisi sulle serie temporali e quindi tutti i valori con 59 secondi sono stati corretti mediante il loro Offset di 1 secondo in avanti, sia nel Training che nei due Test Set. Il primo Test Set contiene rilevazioni temporalmente precedenti al Training ed il secondo Test Set rilevazioni successive. Il termine del primo Test Set non coincide con l'inizio del Training e la fine di quest'ultimo non coincide con l'inizio del secondo Test (ci sono diverse ore di distanza tra i tre). %Per questo non è stato possibile unire i tre dataset in un unico più grande che sarebbe potuto servire per le analisi sulle singole Time Series, che sono state dunque eseguite sul Training Set. % Comunque si riporta quì il grafico della Time Series composta dai tre dataset, dove i valori mancanti sono stati posti pari all'ultimo valore disponibile, approssimata mediante la tecnica che è risultata migliore, la .......
 
 \subsection{Forecasting}
 
@@ -640,17 +665,15 @@ Sono state osservate tutte le Time Series di ciascun attributo ed è stata scelt
 
 \noindent \textbf{ARIMA}: Come suggerito dal grafico della PACF il miglior modello ARIMA per i dati ha Autoregressione di ordine 4 e Media Mobile di ordine 1: ARIMA(4, 0, 1). Nonostante il modello ARIMA funzioni solo su serie stazionarie e non predica la stagionalità, esso riesce a catturare molto bene l'inversione di trend e un accenno di stagionalità sulla serie originale (va tenuto presente che anche la serie originale è abbastanza stazionaria). In questi termini il modello predice dove si sposterà la media della serie e con che velocità lo farà.
 
-\begin{tabular}{ m{3.5cm} m{0cm} }
+\begin{tabular}{ m{5cm} m{0cm} }
 
 \begin{tabular}{ | m{1.7cm} | m{1.2cm} | } 
 \hline
 R2 & 0.3479 \\
 \hline
-MAPE & 0.0295 \\
+MAE & 0.608 \\
 \hline
-MAXAPE & 0.0744 \\
-\hline
-TAPE & 59.479 \\
+MAD & 0.548 \\
 \hline
 \end{tabular}
 
@@ -664,7 +687,7 @@ TAPE & 59.479 \\
 
 \noindent 
 
-\noindent \textbf{Exponential Smoothing}: Data l'accentuata stagionalità nei dati, con periodi giornalieri, è stato prodotto un modello basato su 1440 periodi (1 giorno in minuti), in modo da catturare il pattern tipico della temperatura giornaliera. I risultati dell'Exponential Smoothing stagionale sono i migliori tra i modelli testati.
+\noindent \textbf{Exponential Smoothing}: Data l'accentuata stagionalità nei dati, con periodi giornalieri, è stato prodotto un modello basato su 1440 periodi (1 giorno in minuti), in modo da catturare il pattern tipico della temperatura giornaliera. I risultati dell'Exponential Smoothing stagionale sono i migliori tra i modelli testati (molto probabilmente il modello SARIMAX avrebbe prodotto risultati altrettanto soddisfacenti ma il test di un modello SARIMAX(4, 0, 1, 1440) risulta computazionalmente troppo complesso).
 
 \begin{tabular}{ m{3.5cm} m{0cm} }
 
@@ -715,10 +738,38 @@ MAD & 0.0078 \\
 
 \noindent \textbf{Recurrent Neural Network}:
 
-\section{Task 4}
+\section{Task 4 - Sequential Pattern Mining}
 
 
-\section{Task 5}
+\section{Task 5 - Outlier Detection and Explainability}
+
+Sono già state usate diverse tecniche di Machine Learning per trovare gli Outliers in termini di classe minoritaria in output ('Occupancy' = 1). Devono essere invece trovati gli Outlier degli altri attributi (tutti numerici). Non avendo quindi più bisogno di nessun datset di test sono stati uniti i due forniti al training set per generare un DataFrame più grande su cui trovare gli Outliers. Il dataset di Test 1 è stato posto prima del dataset di training ed il dataset di Test 2 è stato posto dopo, per rispettare le precedenze temporali. In questo caso è possibile fare ciò senza ulteriori modifiche perché, a differenza dei task sulle time series, non c'è bisogno che le rilevazioni dei valori siano continuative nel tempo ed a frequenza constante. Il nuovo dataset è costituito da 20560 oggetti.
+\\
+
+\begin{wrapfigure}[10]{r}{0.5\textwidth}
+\includegraphics[width=7cm]{outliers_Lorenzo/Light_Outliers.png}
+\end{wrapfigure}
+
+
+\noindent \textbf{BoxPlot}: i BoxPlot degli attributi 'Light' e 'CO2' sono già stati rappresentati nella fase iniziale di Data Understanding. Per l'attributo 'Light' il 99-esimo percentile è il valore 744. Cioè l'1\% delle istanze del dataset (che corrispondono a 205 oggetti) ha un valore dell'attributo 'Light' superiore a 744. Questi sono l'1\% degli Outlier. Non esistono invece outliers per i valori bassi dell'attributo perché il valore più basso, 0, costituisce da solo il 62\% dei valori dell'attributo.
+
+
+
+
+\subsection{Clustering and Density Based Outliers Detection}
+
+\noindent \textbf{DBSCAN}: 
+
+\begin{wrapfigure}[9]{r}{0.5\textwidth}
+\includegraphics[width=7cm]{outliers_Lorenzo/distances_from_5th_neighbor.png}
+\end{wrapfigure}
+
+\noindent Sono state calcolate le distanze di Manhattan di ciascun oggetto dal suo quinto punto più vicino ed è stato rappresentato il grafico di queste distanze ordinate. Come si nota tutti gli oggetti con valori canonici si trovano ad una distanza tra 0 e 25 dal quinto oggetto più vicino, mentre quelli che si presuppone siano Outliers hanno una distanza maggiore. Dunque il DBSCAN è stato eseguito con Iper-Parametri: 'min samples' = 5 ed 'eps' = 25. Gli Outliers sono 52 oggetti a cui è stata associata la label -1 dal modello. Di questi solo 12 hanno il valore di 'Light' maggiore di 744, che è pari in media ad un valore molto più alto, 1230. Questo significa che 193 dei 205 Outliers specifici del singolo attributo 'Light' in realtà non sono Outliers di tutto il dataset, perché gli Outliers effettivi sono quelli che hanno congiuntamente 'CO2' e 'Light' elevati. Infatti i 52 Outliers ottenuti con il DBSCAN hanno valori medi nella norma per tutti gli attributi tranne che per 'Light' e soprattutto per 'CO2', pari rispettivamente a 554.25 e 1026. Questo risultato può essere dedotto anche dalle distribuzioni degli attributi: 'CO2' e 'Light' sono i due attributi che più di tutti presentano un marcato addensamento di frequenze nella parte bassa delle distribuzioni e pochissimi oggetti per i valori alti, che vanno a costituire appunto gli Outliers.
+\\
+
+\noindent \textbf{LOF}:
+
+\subsection{Distance and Angle Based Outliers Detection}
 
 
 \end{document}
