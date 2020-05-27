@@ -58,21 +58,18 @@
 
 Il Training Set fornito è costituito da 8143 Oggetti e 7 Attributi. 'Occupancy' è l'attributo binario in output su cui deve essere eseguita la classificazione, che riguarda la previsione della presenza o meno di un soggetto in una stanza. 'Date' è il momento temporale in cui vengono rilevati i valori dei restanti attributi, che sono tutti numerici. La serie temporale riguarda 6 giorni, dal 2015-02-04 alle 17:51:00 al 2015-02-10 alle 09:33:00, con una frequenza di rilevazione di un minuto. Il dataset non presenta alcun Missing Value e gli unici Null Values presenti sono 5160 valori dell'attributo 'Light'. Questi non sembrano costituire un errore di rilevazione perché sono coerenti con il significato dell'attributo (luce nulla quando la stanza è chiusa e inutilizzata o nelle ore notturne). Tutti gli attributi numerici presentano un picco di frequenze sulla parte bassa dei valori, caratteristica questa che è decisamente accentuata negli attributi 'Light' e 'CO2'. E' possibile che 0 e 450 circa siano rispettivamente i valori di 'Light' e 'CO2' nella stanza quando nessuno è presente. Valori diversi invece potrebbero indicare una certa attività nella stanza. Tale ipotesi è avvalorata dai Box Plot dei due attributi con valori raggruppati per classe in output. Le due mediane dei valori di 'Light'e 'CO2' quando 'Occupancy' è 1 sono rispettivamente 450 e 950 circa, molto diversi dai picchi in distribuzione.
 
-\begin{figure}[H] \centering
-\includegraphics[width=7cm]{data_understanding/Light Histogram.png}
-\includegraphics[width=6cm]{data_understanding/Light Boxplot by Occupancy.png}
-
-\includegraphics[width=7cm]{data_understanding/CO2 Densities.png}
+\begin{figure}[H]
+\begin{tabular}{ m{5.5cm} m{5.5cm} m{5cm} }
+\includegraphics[width=6cm]{data_understanding/CO2 Densities.png}
+&
 \includegraphics[width=6cm]{data_understanding/CO2 Boxplot by Occupancy.png}
-
-\caption{\label{fig:frog1}Distribuzioni e Box Plot 'Light', 'CO2'}
+&
+\includegraphics[width=6cm]{data_understanding/Light Boxplot by Occupancy.png}
+\end{tabular}
 \end{figure}
 
-\begin{wrapfigure}[10]{r}{0.5\textwidth}
-\includegraphics[width=7cm]{data_understanding/Light vs Temperature Scatterplot.png}
-\end{wrapfigure}
 
-\noindent Sono stati riprodotti gli Scatter Plot di ciascuna coppia di attributi numerici. I due attributi con la maggior dipendenza lineare sono ovviamente risultati 'Humidity' ed 'Humidity Ratio'. Di fatto i due attributi esprimono lo stesso concetto, l'umidità, in due formati diversi (assoluta e relativa). Sebbene fosse possibile decidere di eliminare uno di essi ciò non è stato fatto perché la complessità del dataset non è un problema. Da un primo elementare approccio grafico l'unico attributo che riesce a discriminare bene tra le classi in output è 'Light'. L'attributo che ha mostrato la correlazione più elevata con 'Light' è stato 'Temperature': Pearson Corr = 0.65, Spearman Corr = 0.565, Kendall Corr = 0.415.
+\noindent I due attributi con la maggior dipendenza lineare sono ovviamente risultati 'Humidity' ed 'Humidity Ratio'. Di fatto i due attributi esprimono lo stesso concetto, l'umidità, in due formati diversi (assoluta e relativa). Da un elementare esame degli Scatter Plot l'unico attributo che riesce a discriminare bene tra le classi in output è 'Light'. L'attributo che ha mostrato la correlazione più elevata con 'Light' è stato 'Temperature': Pearson Corr = 0.65, Spearman Corr = 0.565, Kendall Corr = 0.415.
 
 
 \subsection{Basic Classification Methods}
@@ -84,9 +81,7 @@ Lo scopo di questi modelli non è classificare una Time Series, quindi l'attribu
 
 \begin{figure}[H] \centering
 \includegraphics[width=7cm]{basic_classification/Decision Tree Plot.png}
-\includegraphics[width=9cm]{basic_classification/Decision Boundary Decision Tree CO2 vs Light.png}
-
-\caption{\label{fig:frog1}Decision Tree Results}
+\includegraphics[width=8cm]{basic_classification/Decision Boundary Decision Tree CO2 vs Light.png}
 \end{figure}
 
 \noindent Gli oggetti misclassificati sul Training Set sono solo 99 (di cui 90 sulla classe positiva). La 5 Fold Cross-Validation sul Training Set ha restituito: Accuracy con confidenza del 95\% = 0.98 (+/- 0.05); F1 Score medio pesato con confidenza del 95\% = 0.98 (+/- 0.04). Un singolo Decision Boundary lineare è sufficiente a discriminare bene nelle classi in output e gli errori non sono aree densamente popolate. E' stato appurato che Decision Tree più complessi risultano overfittati sul Training Set e non performano bene sui Test Set.
@@ -98,9 +93,7 @@ Lo scopo di questi modelli non è classificare una Time Series, quindi l'attribu
 \hline\hline \centering
 Accuracy: & 0.9786 & 0.9931 \\
 \hline \centering
-F1-score: & [0.9829, 0.9714] & [0.9956, 0.9838] \\ 
-\hline \centering
-Weighted Avg F1-score: & 0.9787 & 0.9931 \\ 
+F1-score: & [0.9829, 0.9714] & [0.9956, 0.9838] \\
 \hline \centering
 Precision: & [1.00, 0.95] &  [1.00, 0.97] \\
 \hline \centering
@@ -113,11 +106,11 @@ Recall: & [0.97, 1.00] & [0.99, 0.99] \\
 L'ipotesi formulata inizialmente in fase di Data Understanding per l'attributo 'Light' sembra essere confermata. Esso è sufficiente a predire la classe in output, con un semplice Stump che divide i casi in cui la stanza è lievemente o per niente illuminata ('Light' <= 365.125), caso tipico di assenza di persone all'interno, dai casi in cui la stanza è apprezzabilmente illuminata, perché ad esempio le finestre sono state aperte o è stata accesa la luce da qualcuno. Nel Training Set sono presenti 5160 oggetti con valore dell'attributo 'Light' pari a 0, tutti questi hanno valore della classe 'Occupancy' pari a 0.
 \\
 
-\noindent\textbf{K-NN}: Poiché il modello si basa sul calcolo delle distanze tra gli oggetti sia il Training che il Test Set sono stati Standardizzati (gli attributi sono stati riportati tutti a media 0 e varianza 1). La Random Search è stata eseguita cercando i migliori valori del numero di punti nelle vicinanze degli oggetti da classificare, nel dominio [1, 50], e del peso da dare a questi punti per classificare l'istanza. La miglior combinazione di Iper-Parametri è 'weights'='uniform', 'n neighbors'=46. 
+\noindent\textbf{K-NN}: Poiché il modello si basa sul calcolo delle distanze tra gli oggetti sia il Training che i Test Set sono stati Standardizzati (gli attributi sono stati riportati tutti a media 0 e varianza 1). La Random Search è stata eseguita cercando i migliori valori di 'n neighbors' nel dominio [1, 50] e del tipo di peso da dare a questi punti vicini per classificare l'istanza. La miglior combinazione di Iper-Parametri è 'weights'='uniform', 'n neighbors'=46. 
 
 \begin{figure}[H] \centering
 \includegraphics[width=7cm]{basic_classification/Feature Importance K-NN.png}
-\includegraphics[width=9cm]{basic_classification/Decision Boundary K-NN CO2 vs Light.png}
+\includegraphics[width=8cm]{basic_classification/Decision Boundary K-NN CO2 vs Light.png}
 \end{figure}
 
 \noindent L'attributo più importante è sempre 'Light' ma anche 'CO2' riveste una seppur minima importanza. La Cross-Validation sul Training Set ha restituito una performance peggiore di quella del Decision Tree: Accuracy con confidenza del 95\% = 0.95 (+/- 0.08); F1 Score medio pesato con confidenza del 95\% = 0.95 (+/- 0.07). Anche la performance sui Test Set è peggiore, quindi 'CO2' in realtà non aggiunge significatività al modello.
@@ -129,9 +122,7 @@ L'ipotesi formulata inizialmente in fase di Data Understanding per l'attributo '
 \hline\hline \centering
 Accuracy: & 0.9595 & 0.956 \\
 \hline \centering
-F1-score: & [0.9684, 0.9434] & [0.9721, 0.8957] \\ 
-\hline \centering
-Weighted Avg F1-score: & 0.9593 & 0.9561 \\ 
+F1-score: & [0.9684, 0.9434] & [0.9721, 0.8957] \\
 \hline \centering
 Precision: & [0.96, 0.96] &  [0.97, 0.89] \\
 \hline \centering
@@ -146,7 +137,7 @@ Recall: & [0.98, 0.93] & [0.97, 0.90] \\
 \noindent\textbf{Naive Bayes}: Non è necessario il Tuning di nessun iper-parametro.
 
 \begin{wrapfigure}[10]{r}{0.5\textwidth}
-\includegraphics[width=9cm]{basic_classification/Decision Boundary Naive Bayes CO2 vs Light.png}
+\includegraphics[width=8cm]{basic_classification/Decision Boundary Naive Bayes CO2 vs Light.png}
 \end{wrapfigure}
 
 \noindent Come per il K-NN oltre a 'Light' anche la 'CO2' riveste una minima importanza e di nuovo i risultati in termini di Cross-Validation sul Training Set e di test sui Test Set sono lievemente peggiori dello Stump banale. Solo l'area sotto le ROC Curve è maggiore. Questo significa che usando il 50\% come threshold di probabilità per la classificazione il modello ha una performance peggiore ma in genere risulta più stabile del Decision Tree perché i True Positive e False Positive restituiscono risultati migliori se facciamo variare il threshold. \newline
@@ -161,9 +152,7 @@ AUC(Test 1)=0.989, AUC(Test 2)=0.996.
 \hline\hline \centering
 Accuracy: & 0.9774 & 0.9876 \\
 \hline \centering
-F1-score: & [0.9820, 0.9699] & [0.9921, 0.9711] \\ 
-\hline \centering
-Weighted Avg F1-score: & 0.9776 & 0.9876 \\ 
+F1-score: & [0.9820, 0.9699] & [0.9921, 0.9711] \\
 \hline \centering
 Precision: & [1.00, 0.95] &  [1.00, 0.95] \\
 \hline \centering
@@ -193,8 +182,7 @@ P = \frac{1}{1 + \text{exp}(19.32 - 1.4 * \text{Temp} - 0.04 * \text{Humid} + 0.
 
 \begin{figure}[H] \centering
 \includegraphics[width=7cm]{basic_classification/Feature Importance Logistic Regression.png}
-\includegraphics[width=9cm]{basic_classification/Decision Boundary Logistic Regression CO2 vs Light.png}
-\caption{\label{fig:frog1}Decision Tree Validation}
+\includegraphics[width=8cm]{basic_classification/Decision Boundary Logistic Regression CO2 vs Light.png}
 \end{figure}
 
 \noindent La Cross-Validation sul Training Set ha restituito valori leggermente migliori del Decision Tree, perché la varianza è minore: Accuracy con confidenza del 95\%: 0.98 (+/- 0.03); F1 Score medio pesato con confidenza del 95\%: 0.98 (+/- 0.03). Le performance sui Test Set sono ancora leggermente peggiori dello Stump ma l'AUC è risultata la più alta di tutti i modelli, rendendo di fatto la Logistic Regression il modello più stabile.
@@ -206,9 +194,7 @@ P = \frac{1}{1 + \text{exp}(19.32 - 1.4 * \text{Temp} - 0.04 * \text{Humid} + 0.
 \hline\hline \centering
 Accuracy: & 0.9764 & 0.9842 \\
 \hline \centering
-F1-score: & [0.9811, 0.9683] & [0.9900, 0.9619] \\ 
-\hline \centering
-Weighted Avg F1-score: & 0.9765 & 0.9841 \\ 
+F1-score: & [0.9811, 0.9683] & [0.9900, 0.9619] \\
 \hline \centering
 Precision: & [0.99, 0.95] &  [0.99, 0.97] \\
 \hline \centering
@@ -218,19 +204,21 @@ Recall: & [0.97, 0.99] & [0.99, 0.95] \\
 \end{center}
 
 \begin{figure}[H] \centering
-\includegraphics[width=7cm]{basic_classification/ROC Curve Test 1 Logistic Regression.png}
-\includegraphics[width=7cm]{basic_classification/ROC Curve Test 2 Logistic Regression.png}
+\includegraphics[width=6cm]{basic_classification/ROC Curve Test 1 Logistic Regression.png}
+\includegraphics[width=6cm]{basic_classification/ROC Curve Test 2 Logistic Regression.png}
 \caption{\label{fig:frog1}Logistic Regression Test on Test Set 1 and Test Set 2}
 \end{figure}
 
 \noindent La regressione logistica è stata calibrata e testata anche con il solo attributo 'Light' in input. Il modello ottenuto è il seguente:
 
-\begin{tabular}{ m{20em} m{3cm} }
+\begin{tabular}{ m{8cm} m{0cm} }
 \begin{equation}
 P = \frac{1}{1 + \text{exp}(0.025 - 8.752 * \text{Light})}
 \end{equation}
 &
-\includegraphics[width=7cm]{basic_classification/Logistic Regression con 'Light'.png}
+\begin{figure}[H]
+\includegraphics[width=5cm]{basic_classification/Logistic Regression con 'Light'.png}
+\end{figure}
 \end{tabular}
 
 \noindent Le performance sui Test sono identiche a quelle del Decision Tree iniziale perché questo modello porta allo stesso Decision Boundary singolo.
@@ -242,13 +230,16 @@ P = \frac{1}{1 + \text{exp}(0.025 - 8.752 * \text{Light})}
 Poiché 'Light' è risultato ampiamente l'attributo più importante è stato scelto per tentare di predirne i valori mediante le regressioni. E' stata calibrata una regressione lineare (in due dimensioni) con solo l'attributo 'Temperature' in input, che è quello risultato più correlato con 'Light' nella fase di Data Understanding. La regressione rappresentata è sul Test Set e sono stati eliminati gli oggetti con valore di 'Light' pari a 0 (solo graficamente, non nel calcolo dei risultati, per focalizzare l'attenzione sulla parte importante della relazione lineare).
 
 
-\begin{tabular}{ m{20em} m{3cm} }
+\begin{tabular}{ m{8cm} m{0cm} }
 \begin{equation}
 \text{Light} = -2447.03 + 124.47 * \text{Temp}
 \end{equation}
 &
-\includegraphics[width=8cm]{regression/Light vs Temperature Linear Regression.png}
+\begin{figure}[H]
+\includegraphics[width=6cm]{regression/Light vs Temperature Linear Regression.png}
+\end{figure}
 \end{tabular}
+
 
 
 \noindent La performance viene misurata con il Coefficiente di Determinazione, lo Scarto Quadratico Medio e lo Scarto Assoluto Medio su entrambi i Test Set.
@@ -293,72 +284,168 @@ MAE: & 131.360 & 148.516 \\
 
 \subsection{Dimensionality Reduction}
 
-\noindent\textbf{Dimensionality Reduction Tests}: We addressed the task by first testing the various Dimensionality Reduction methods using  the Decision Tree as a classifier. After obtaining the results which we will discuss shortly,  we have tested various classification methods (namely, Decision Tree, KNN, Naïve Bayes and Logistic Regression) on two-component PCA (next paragraph). We started with the Variance Threshold method. We realized that, as expected, the different threshold parameters yielded different numbers of dimensions. Namely, in terms of integers, results of the parameter search can be observed in the adjacent table.
-
+\noindent\textbf{Dimensionality Reduction Methods con Decision Tree}: sono state testate le varie tecniche per ridurre le dimensioni del dataset ed è stato poi istruito un Decision Tree sui nuovi dataset. \newline
+Il primo metodo testato è stato il Variance Threshold. Nella tabella quì sotto si può osservare come variano le dimensioni del dataset al variare del livello di varianza sotto al quale un attributo viene eliminato.
 
 \begin{center}
 \begin{tabular}{ | m{7em} | m{5cm}| }
 \hline
 Dataset Shape & Integer Variance Threshold \\
-\hline\hline \centering
-(8143,5) & 0 \\
-\hline \centering
-(8143,4) & 1 \\ 
-\hline \centering
-(8143,3) & 2 \\ 
-\hline \centering
-(8143,2) & 31 \\
-\hline \centering
-(8143,1) & 37926 \\
+\hline\hline
+(8143,5) \centering & 0 \\
+\hline
+(8143,4) \centering & 1 \\ 
+\hline
+(8143,3) \centering & 2 \\ 
+\hline
+(8143,2) \centering & 31 \\
+\hline
+(8143,1) \centering & 37926 \\
 \hline
 \end{tabular}
 \end{center}
 
 
+\noindent I risultati delle classificazioni su questi nuovi dataset sono esattamente gli stessi della classificazione sul dataset intero quando la soglia è compresa tra 1 e 37925, cioè con dataset tra 2 e 4 dimensioni. Tuttavia i risultati peggiorano significativamente per un numero di dimensioni pari a uno, ottenute con Threshold di 37926. Li riportiamo quì. \newline
 
-\noindent The results of the Variance threshold analysis are exactly the same in terms of precision, accuracy and recall as if the dataset dimensions were not reduced at all when the threshold is anywhere between 1 and 37925 (which yields a number of dimensions between 2 and 4). However, the results significantly worsen for number of dimensions equal to one which is achieved with a threshold of 37926 onwards(Figure 1).
 
-\begin{figure}[H] \centering
-\includegraphics[width=10cm]{dimens_reduction/figure_1.png}
-\caption{\label{fig:frog1}Figure 1}
+\begin{tabular}{ m{3cm} m{2cm} }
+Accuracy: 0.867167
+
+&
+
+\begin{tabular}{ | m{3cm} | m{2cm} |  m{2cm} |  m{2cm} | } 
+\hline
+& F1-score & Precision & Recall \\
+\hline\hline
+Class 0 \centering & 0.8911 & 0.93 & 0.86 \\
+\hline
+Class 1 \centering & 0.8298 & 0.78 & 0.89 \\
+\hline
+\end{tabular}
+
+\end{tabular}
+
+\noindent \textbf{Univariate Feature Selection, Singular Value Decomposition e Principal Component Analysis}. Come parametro abbiamo inserito numeri da k = 1 a k = 4 numero di dimensioni e osservato i risultati. È interessante notare che i risultati in termini di accuratezza, precisione e richiamo erano tutti uguali per diversi k numero di dimensioni, ma cambiati rispetto a ciascuno di questi tre metodi DR. Tuttavia, cambiano per ogni k quando vengono applicati altri classificatori, come KNN, Linear Regression e Naïve Bayes. Ad esempio, quando utilizziamo UFS con regressione lineare o Naïve Bayes, i risultati rimangono gli stessi per k = 1 e 2, ma cambiano per k = 3 e 4. È anche importante notare  che il metodo UFS seleziona ‘Light’ quando k = 1, ‘Light’ and ‘CO2’ quando k =2, ‘Light’, ‘CO2’ e ‘Temperature’ con k = 3, ‘Light’, ‘CO2’ e ‘Temperature’ e ‘Humidity’ con k = 4. SVC e PCA, modificano completamente gli attributi e producono un nuovo array monodimensionale o multidimensionale (a seconda del k indicato) invece di selezionare gli attributi migliori.
+ I risultati ottenuti dall'analisi UFS e RFE sono identici alla dataset non ridotta. È interessante osservare che il metodo RFE ha delineato "Light" come unico attributo da conservare. I risultati ottenuti dalla PCA sono riportati nella figura 2 e i risultati ottenuti dalla SVD sono riportati nella figura 3. Infine, possiamo concludere che, usando il classificatore della Decision Tree, nessuno dei metodi ha prodotto risultati migliori rispetto alla dataset non ridotta classificata con Logistic Regression . Per completare l'analisi, dovremmo riprodurre i risultati usando tutti e quattro i classificatori, ma per motivi di rispetto del limite di pagine del rapporto, non lo faremo. \newline
+
+\begin{tabular}{ m{3cm} m{2cm} }
+Accuracy: 0.97523
+
+&
+
+\begin{tabular}{ | m{3cm} | m{2cm} |  m{2cm} |  m{2cm} | } 
+\hline
+& F1-score & Precision & Recall \\
+\hline\hline \centering
+Class 0 & 0.9802 & 0.99 & 0.97 \\
+\hline \centering
+Class 1 & 0.9668 & 0.95 & 0.99 \\
+\hline
+\end{tabular}
+
+\end{tabular}
+
+
+
+\begin{tabular}{ m{3cm} m{2cm} }
+Accuracy: 0.97036
+
+&
+
+\begin{tabular}{ | m{3cm} | m{2cm} |  m{2cm} |  m{2cm} | } 
+\hline
+& F1-score & Precision & Recall \\
+\hline\hline \centering
+Class 0 & 0.9761 & 1.0 & 0.95 \\
+\hline \centering
+Class 1 & 0.9609 & 0.93 & 1.0 \\
+\hline
+\end{tabular}
+\end{tabular}
+
+
+\noindent \textbf{PCA a due componenti testata su diversi classificatori}: Oltre agli esperimenti su diverse tecniche di riduzione della dimensionalità, abbiamo testato l'analisi PCA con due componenti (due dimensioni) sulla Decision Tree(Figura 2), KNN (Figura 4), Naïve Bayes (Figura 5) e Regressione logistica (Figura 6). I risultati ottenuti per l'albero decisionale con due componenti sono leggermente peggiori rispetto ai risultati ottenuti utilizzando il set di dati completo. La precisione con PCA a 2 componenti per KNN è rimasta la stessa, la F1 rispetto alla classe 0 è leggermente migliorata mentre la F1 per la classe 1 è leggermente peggiorata. I risultati sono peggiorati per NB e, soprattutto, migliorati per la regressione logistica quando si utilizzano solo due componenti nel PCA rispetto all'applicazione della regressione logistica a tutti gli attributi della dataset. È interessante notare che la regressione logistica con un'analisi PCA a due componenti offre precisione, accuratezza e risultati di recall identici all'albero decisionale quando applicati alla dataset intera. Abbiamo testato i risultati sul secondo test set (datatest2.txt) e i risultati sono ulteriormente migliorati (Figura 10). \newline
+
+\begin{tabular}{ m{3cm} m{2cm} }
+Accuracy: 0.99313
+
+&
+
+\begin{tabular}{ | m{3cm} | m{2cm} |  m{2cm} |  m{2cm} | } 
+\hline
+& F1-score & Precision & Recall \\
+\hline\hline \centering
+Class 0 & 0.9956 & 1.0 & 0.99 \\
+\hline \centering
+Class 1 & 0.9838 & 0.97 & 0.99 \\
+\hline
+\end{tabular}
+\end{tabular}
+
+
+\noindent Infine, nella Figura 7 possiamo osservare la rappresentazione bidimensionale del set di dati ottenuto con il PCA. La Figura 8 mostra lo stesso, tranne per il fatto che la training set è stata ridotta a 1000 campioni invece di 8143, e quindi il trend può essere osservato di meglio. È anche interessante osservare la frazione di varianza rispetto a ciascuno dei 5 attributi (‘date’ escluso) nella Figura 9.  Vediamo che la frazione di varianza più grossa appartiene a Temperature, seguita da Humidity, Light, CO2 e Humidity Ratio. \newline
+
+\begin{tabular}{ m{3cm} m{2cm} }
+Accuracy: 0.97824
+
+&
+
+\begin{tabular}{ | m{3cm} | m{2cm} |  m{2cm} |  m{2cm} | } 
+\hline
+& F1-score & Precision & Recall \\
+\hline\hline \centering
+Class 0 & 0.9826 & 1.0 & 0.97 \\
+\hline \centering
+Class 1 & 0.9709 & 0.95 & 1.0 \\
+\hline
+\end{tabular}
+\end{tabular}
+
+
+\begin{tabular}{ m{3cm} m{2cm} }
+Accuracy: 0.94822
+
+&
+
+\begin{tabular}{ | m{3cm} | m{2cm} |  m{2cm} |  m{2cm} | } 
+\hline
+& F1-score & Precision & Recall \\
+\hline\hline \centering
+Class 0 & 0.9576 & 1.0 & 0.92 \\
+\hline \centering
+Class 1 & 0.9336 & 0.88 & 1.0 \\
+\hline
+\end{tabular}
+\end{tabular}
+
+
+\begin{tabular}{ m{3cm} m{2cm} }
+Accuracy: 0.97824
+
+&
+
+\begin{tabular}{ | m{3cm} | m{2cm} |  m{2cm} |  m{2cm} | } 
+\hline
+& F1-score & Precision & Recall \\
+\hline\hline \centering
+Class 0 & 0.9826 & 1.0 & 0.97 \\
+\hline \centering
+Class 1 & 0.9709 & 0.95 & 1.0 \\
+\hline
+\end{tabular}
+\end{tabular}
+
+
+\begin{figure}[H]
+\begin{tabular}{ m{6cm} m{6cm} m{6cm} }
+\includegraphics[width=6cm]{dimens_reduction/figure_7.png}
+&
+\includegraphics[width=6cm]{dimens_reduction/figure_8.png}
+&
+\includegraphics[width=5cm]{dimens_reduction/figure_9.png}
+\end{tabular}
 \end{figure}
-
-\noindent Univariate Feature Selection, Singular Value Decomposition  and Principal Component Analysis. As the parameter we inserted numbers from k=1 to k=4 number of dimensions, and observed the results. Interestingly enough, the results in terms of  accuracy, precision and recall were all the same for different k number of dimensions, but changed with respect to each of these three DR methods. They however change for each k when other classifiers are applied, such as KNN, Linear Regression and Naïve Bayes. For example when we employ UFS with Linear Regression or Naïve Bayes, the results stay the same for k=1&2, but change for k=3&4. It is also important to mention that the UFS method selects Light when the k=1, Light and CO2 when the k=2, Light, CO2 and temperature when the k=3, Light, CO2, temperature and the humidity ratio when the k=4.Singular Value Decomposition and PCA, however, completely alter the attributes and yield a new single-or multi dimensional array (depending on the k given) instead of selecting the best attributes.
-\\
-
-\noindent The results obtained by the UFS and RFE analysis are identical to the dataset which is not reduced. It is interesting to observe that the RFE method delineated ‘Light’ as the only attribute worth keeping. The results obtained by the PCA are reported in figure 2 and the results obtained by SVD are reported in figure 3. Finally, we can conclude that, using the Decision Tree classifier, none of the methods yielded better results than the non-reduced dataset did. In order to complete the analysis, we should reproduce the results using all the four classifiers, but for the sake of keeping to the page limit of the report, we will not do that.
-
-
-\begin{figure}[H] \centering
-\includegraphics[width=8cm]{dimens_reduction/figure_2.png}
-\includegraphics[width=8cm]{dimens_reduction/figure_3.png}
-\caption{\label{fig:frog1}Figure 2 and 3}
-\end{figure}
-
-
-\noindent\textbf{PCA two component analysis tested on different classifiers}: In addition to experiments on different dimensionality reduction techniques, we tested the PCA analysis with two components (two dimensions) on Decision Tree (Figure 2), KNN(Figure 4), Naïve Bayes(Figure 5), and Logistic Regression(Figure 6). 
-
-\begin{figure}[H] \centering
-\includegraphics[width=8cm]{dimens_reduction/figure_4.png}
-\includegraphics[width=8cm]{dimens_reduction/figure_5.png}
-\includegraphics[width=8cm]{dimens_reduction/figure_6.png}
-\caption{\label{fig:frog1}Figure 4, 5 and 6}
-\end{figure}
-
-
-\noindent The results obtained for the decision tree with two components are slightly worse with respect to the results obtained using the complete dataset. Accuracy with 2-component PCA for KNN remained the same, F1 with respect to the class 0 slightly improved whereas the F1 for the class 1 slightly worsened. The results worsened for the NB and, most importantily,  improved for the Logistic Regression when using only two components in the PCA with respect to applying the Logistic regression to all the attributes in the dataset. Interestingly enough, Logistic regression  with a two component PCA analysis  delivers precision, accuracy and recall results identical to the decision tree when applied to the whole dataset. We tested the results on the second test set (datatest2.txt) and the results improved even further (Figure 10).
-Finally, in the Figure 7 we can observe the two dimensional representation of the dataset obtained with the PCA. Figure 8 shows the same, except for the fact that the training set has been reduced to 1000 samples instead of 8143, and the trend can thus be observed better. It is also interesting to observe the fraction of variance with respect to each of the  5 attributes (date excluded) in Figure 9.
-
-
-\begin{figure}[H] \centering
-\includegraphics[width=8cm]{dimens_reduction/figure_7.png}
-\includegraphics[width=8cm]{dimens_reduction/figure_8.png}
-\includegraphics[width=8cm]{dimens_reduction/figure_9.png}
-\includegraphics[width=8cm]{dimens_reduction/figure_10.png}
-\caption{\label{fig:frog1}Figure 7, 8, 9 and 10}
-\end{figure}
-
-
 
 
 \subsection{Imbalanced Learning}
@@ -579,22 +666,26 @@ Abbiamo ottenuto i seguenti grafici utilizzando il training set modificato attra
 
 \textbf{Random Forest}: I Decision Boundary tipici che hanno restituito i risultati più stabili, apprezzabili dal valore degli indici di validazione sul Training Set e dell'area AUC sul Test Set, sono stati quelli della Logistic Regression e Naive Bayes. Tramite la Random Forest è stato posto l'obiettivo di raggiungere quella stabilità, tramite un Decision Boundary analogo, insieme ad una performance sui Test Set pari a quella ottenuta con il Decision Tree. Lo scopo è stato raggiunto con un modello che ha per Iper-Parametri: 'max features'='log2', 'random state'=0, 'n estimators'=100', 'max depth'=3 e i valori di default per gli altri. Il valore migliore della 'max depth' è stato trovato mediante la Random Search cercando nel dominio [1,100] e ottimizzando per l'F1 Score. Il fatto che il 'max depth' ottimale sia un valore basso indica che sono sufficienti singoli alberi semplici non overfittati. Le feature diverse da 'Light' aumentano la loro importanza. Il Decision Boundary è più preciso per valori bassi di 'CO2'. Quando 'CO2' è basso 'Light' viene splittato ad un valore leggermente superiore a 365.125, come si nota dall'albero proposto quì (split a 371.125). In questo modo la zona di maggior contatto tra gli addensamenti delle due classi in output viene separata con più precisione.
 
-\begin{figure}[H] \centering
-\includegraphics[width=6cm]{ensamble/Random Forest Plot.png}
-\includegraphics[width=9cm]{ensamble/Feature Importance Random Forest.png}
-\includegraphics[width=9cm]{ensamble/Decision Boundary Random Forest CO2 vs Light.png}
+\begin{figure}[H]
+\begin{tabular}{ m{5cm} m{6cm} m{5cm} }
+\includegraphics[width=5cm]{ensamble/Random Forest Plot.png}
+&
+\includegraphics[width=6cm]{ensamble/Feature Importance Random Forest.png}
+&
+\includegraphics[width=6cm]{ensamble/Decision Boundary Random Forest CO2 vs Light.png}
+\end{tabular}
 \end{figure}
+
 
 \noindent La 5 Fold Cross-Validation sul Training Set ha restituito: Accuracy con confidenza del 95\% = 0.98 (+/- 0.03); F1 Score medio pesato con confidenza del 95\% = 0.98 (+/- 0.03). Con una varianza minore del Decision Tree semplice il modello risulta più stabile sul Training Set. Sui Test Set i risultati delle metriche di valutazione sono identici a quelli del Decision Tree iniziale. Migliora però l'AUC per entrambi i Test Set: AUC(Test 1)=0.986 AUC(Test 2)=0.996. Dnque il modello è più stabile anche sui Test Set e l'obiettivo è stato raggiunto (questo modello è leggermente migliore dello Stump sul dataset iniziale non trasformato).
 \\
 
 
-\noindent \textbf{Bagging}: Il Bagging è stato eseguito con lo stesso scopo della Random Forest, con classificatori diversi dal Decision Tree: Support Vector Machine, Naive Bayes, Logistic regression. Particolare attenzione è stata riservata a quest'ultimo perché era stato il modello più stabile nella fase di classificazione di base. I risultati migliori in assoluto fino ad ora infatti vengono ottenuti con un Bagging composto da 50 Logistic Regression (50 è il numero di base classifier minimo per raggiungere il risultato migliore). A fronte degli stessi risultati della Random Forest sia per la Cross-Validation che per i test abbiamo quì i migliori valori dell'AUC.
+\noindent \textbf{Bagging}: Il Bagging è stato eseguito con lo stesso scopo della Random Forest, con classificatori diversi dal Decision Tree: Support Vector Machine, Naive Bayes, Logistic regression. Particolare attenzione è stata riservata a quest'ultimo perché era stato il modello più stabile nella fase di classificazione di base. I risultati migliori in assoluto fino ad ora infatti vengono ottenuti con un Bagging composto da 50 Logistic Regression (50 è il numero di base classifier minimo per raggiungere il risultato migliore). A fronte degli stessi risultati della Random Forest sia per la Cross-Validation che per i test abbiamo quì i migliori valori dell'AUC: AUC(Test 1)=0.992 AUC(Test 2)=0.996.
 
-\begin{figure}[H] \centering
-\includegraphics[width=7cm]{ensamble/ROC Curve Test 1 Bagging.png}
-\includegraphics[width=7cm]{ensamble/ROC Curve Test 2 Bagging.png}
-\end{figure}
+\begin{wrapfigure}[8]{r}{0.5\textwidth} \centering
+\includegraphics[width=6cm]{ensamble/ROC Curve Test 1 Bagging.png}
+\end{wrapfigure}
 
 \noindent I risultati con gli altri tipi di classificatori base sono tutti peggiori. La Regressione Logistica è risultato il modello migliore anche dopo aver ridotto il Dataset a due dimensioni con la PCA. Dunque è stato fatto un tentativo di classificazione con Bagging sulle Logistic Regressions anche con il dataset bidimensionale uscito dalla PCA. I risultati però sono stati lievemente peggiori di quelli discussi quì sopra.
 \\
@@ -602,39 +693,134 @@ Abbiamo ottenuto i seguenti grafici utilizzando il training set modificato attra
 \noindent \textbf{Boosting}: Come è noto l'AdaBoost Classifier è un Ensamble method che si basa sulla maggior attenzione riservata agli oggetti misclassificati nelle iterazioni precedenti. A questo modello quindi è stato riservato lo scopo di produrre un Decision Boundary che individuasse l'area centrale dello Scatterplot dove è presente un piccolo addensamento di oggetti con label in outpu 0 che sono sempre stati classificati male. Essi potrebbero essere i False Positive che hanno tenuto lievemente più bassa la Precision in tutti i classificatori di base. Lo scopo è stato raggiunto con un modello che usa il Decision Tree come Base Classifier e che ha per Iper-Parametri: 'n estimators'=100, 'random state'=0 e 'learning rate'=0.2, quest'ultimo trovato ottimizzando l'F1 Score tramite una Grid Search nel dominio [0,1] con step 0.1.
 
 
-\begin{wrapfigure}[13]{r}{0.5\textwidth}
-\includegraphics[width=9cm]{ensamble/Decision Boundary AdaBoost Tree CO2 vs Light.png}
+\begin{wrapfigure}[12]{r}{0.5\textwidth} \centering
+\includegraphics[width=7cm]{ensamble/Decision Boundary AdaBoost Tree CO2 vs Light.png}
 \end{wrapfigure}
 
-\noindent Come si può notare dal Boundary vengono individuati in pratica tutti gli oggetti precedentemente misclassificati sul Training Set. L'esito sia in termini di Cross-Validation sul Training Set che in termini di Test peggiorano sensibilmente. Accuracy ed F1 Score medio pesato passano entrambi ad un valore di 0.93 con due deviazioni standard (95\% di confidenza) dell'ordine di 0.12. Sui Test Set l'Accuracy passa a 0.922 e 0.938 rispettivamente e la Positive Precision peggiora passando a 0.94 e 0.85 rispettivamente. Le AUC poi crollano a 0.905 e 0.91. Il modello è evidentemente overfittato sul Training Set e questo dimostra che gli oggetti al centro dello ScatterPlot, con 'Light' superiore a 600 e 'CO2' intorno a 1000 sono più un caso specifico presente nel Training Set fornito piuttosto che una relazione da cui poter derivare conclusioni sul generali.\newline
+\noindent Come si può notare dal Boundary vengono individuati in pratica tutti gli oggetti precedentemente misclassificati sul Training Set. L'esito sia in termini di Cross-Validation sul Training Set che in termini di Test peggiorano sensibilmente. Accuracy ed F1 Score medio pesato passano entrambi ad un valore di 0.93 con due deviazioni standard (95\% di confidenza) dell'ordine di 0.12. Sui Test Set l'Accuracy passa a 0.922 e 0.938 rispettivamente e la Positive Precision peggiora passando a 0.94 e 0.85 rispettivamente. Le AUC crollano a 0.905 e 0.91. Il modello è evidentemente overfittato sul Training Set e questo dimostra che gli oggetti al centro dello ScatterPlot, con 'Light' superiore a 600 e 'CO2' intorno a 1000 sono più un caso specifico presente nel Training Set fornito piuttosto che una relazione da cui poter derivare conclusioni sul generali.\newline
 L'AdaBoost è stato utilizzato anche con un Naive Bayes Classifier che ha permesso di individuare come zona della classe 0 anche quella con 'CO2'>1200 e 'Light'>600. I risultati però sono stati altrettanto pessimi.
 
 
 \subsection{Neural Networks and Deep Learning}
 
-\noindent \textbf{Single Layer Perceptron}: Gli iper-parametri usati per ottenere i risultati migliori con la  funzione Perceptron sono stati scelti usando la funzione CrossValidationCV con l’obiettivo di miglioramento della misura F1. Nonostante la ottimizazzione del modello raggiunta con alpha uguale a 0.0281 e penalty uguale a L1 (regressione lasso) , i risultati ottenuti non si sono mostrati i migliori (Figure1).
-\begin{wrapfigure}[9]{r}{0.5\textwidth}
-\includegraphics[width=12cm]{NN/figure 1.png}
+\noindent \textbf{Single Layer Perceptron}: Gli iper-parametri usati per ottenere i risultati migliori con la  funzione Perceptron sono stati scelti usando la CrossValidationCV, massimizzando per l'F1. Il miglior modello ha alpha uguale a 0.0281 e 'Penalty' uguale a 'L1' (regressione lasso), ma i risultati ottenuti sono pessimi: Accuracy=0.756; F1-Score Weighted Average=0.72.
+
+
+\noindent \textbf{Multi Layer Perceptron}: sono state eseguite molteplici prove con i vari iper-parametri per il Multi Layer Perceptron e si è assistito ad alcuni esiti interessanti. Ad esempio, con due hidden layer i risultati non variano molto se il primo layer contiene da 100 nodi in su o se il secondo ne contiene da 50 in su. Questo ha portato a preferire l'uso di 100 e 50 nodi rispettivamente nel primo e secondo layer per evitare modelli complessi, possibilmente Overfittati, che non migliorassero apprezzabilmente i risultati. In una delle prime prove con il 'MLP' dunque si è settato il primo layer a 100, il secondo a 50, ed anche un terzo layer a 25, scegliendo Adam come solver, l’alpha di 0.0001, il learning rate 'Adattivo', la funzione di attivazione Tangente iperbolica ed un Momentum di 0.9. La Loss è risultata bassa (0.01868) ed Accuracy e F1 sono migliorati rispetto al Single Layer Perceptron (0.92908 e 0.9457, 0.89778, rispettivamente), ma ancora non raggiungono i risultati migliori ottenuti con altri classificatori.
+
+\begin{wrapfigure}[13]{r}{0.5\textwidth}
+\includegraphics[width=7cm]{NN/Figure 2.png}
 \end{wrapfigure}
 
 
-\noindent \textbf{Multi Layer Perceptron}: Dopo multiple prove e sperimenti con i vari iper-parametri per multi layer perceptron, sono state scoperte parecchie cose interessanti. Ad esempio, se ci sono solo due hidden layer, non cambia molto i risultati se il primo layer è settato a 100 o a 200, o se il secondo è settato a 50 o a 90. 
-Una delle prime prove con MLP era quella di settare il primo layer a 100, il secondo a 50, e il terzo a 25, scegliendo Adam come solver, l’alpha di 0.0001 la learning rate adattiva, e la funzione di attivazione tangente iperbolica con momentum di 0.9. Mentre la Loss usciva abbastanza bassa (0.01868), l’accuracy e F1 (0.92908 e 0.9457, 0.89778, rispettivamente)  invece usciva molto di meglio con rispetto alla Single Layer Perceptron, però molto di peggio con rispetto ai risultati migliori ottenuti finora con gli altri classifier.
-Dopo tante prove, I risultati invece si sono migliorati scegliendo Stochastic Gradient Descent come solver al posto di adam, e riducendo il numero dei strati a 2, cioè, 100 e 50 per evitare l’overfitting della dataset. Un’altra cosa fatta con lo stesso scopo era alzare l’alpha che si aggiunge alla loss function a 0.01 per ‘penalizzare’ il modello per l’overfitting. Abbiamo di nuovo scelto L2 (lasso regression).  Nonostante l’alzamento della Loss corrente al 0.05 con rispetto al modello precedente, l’accuracy invece è saltata a 0.9786  e le misure F1 a 0.9829 e 0.97124, rispettivamente per la variabile indipendente (‘Occupancy’) di 0 e 1. Il grafico della loss function può essere osservato nella figura 2. 
+\noindent Successivamente ad altre prove i risultati si sono migliorati scegliendo Stochastic Gradient Descent come solver al posto di adam e mantenendo soltanto i primi due layers da 100 e 50 nodi rispettivamente per evitare l’Overfitting (il terzo layer non apporta miglioramenti significativi). L’alpha è stato aumentato a 0.01 sempre allo scopo di penalizzare modelli complessi. Di nuovo è stato scelto L2 come 'Penalty' (lasso regression). Nonostante un lieve aumento della Loss a 0.05 rispetto al modello precedente (il cui grafico può essere osservato quì), l’Accuracy è aumentata a 0.9786 e l'F1 a 0.9829 e 0.97124, rispettivamente per i valori in output 0 e 1.
+\\
 
-\begin{figure}[H]\centering
-\includegraphics[width=9cm]{NN/Figure 2.png}
-\end{figure}
+\noindent \textbf{Deep Learning}: per approfondire le analisi sui Deep Neural Networks è stata usata anche la libreria Keras. È stato istruito un modello con 2 Hidden Layer da 100 e 50 nodi rispettivamente, entrambi con funzione di attivazione 'relu', e un Output Layer con funzione di attivazione 'sigmoid'. Essendo un problema binario si è usato la Cross-Entropy. Come modello per l'ottimizzazione si è usato 'Adam', massimizzando per l'Accuracy. Il numero delle epoche è stato settato a 200. Questo DNN è stato testato con un numero di Batch pari a 5, 25 e 50, ottenendo i risultati in figura. 
+
+\begin{wrapfigure}[13]{r}{0.5\textwidth}
+\includegraphics[width=8cm]{Deep NN/figura_1.png}
+\end{wrapfigure}
+
+
+\noindent Si può osservare che le curve delle Loss per 5 e 25 Batches seguono pressoché lo stesso andamento (l'unica differenza rilevante è che la prima parte più in basso). La curva della Loss per 50 Batches invece parte già da un valore di Loss molto basso e rimane sempre abbastanza stabile. \newline
+Il training set è stato suddiviso in Training e Validation Set. Si è costruito un modello che fa uso dell'Early Stopping con 'Patience' di 5 iterazioni, calcolando la Loss sul Validation Set, sempre con 200 Epoche. Questi sono i risultati riguardanti Loss e Accuracy di tutti e quattro i modelli costruiti: 5 Batch: Loss=0.252636, Accuarcy=0.951219 (Accuracy più alta); 10 Batch: Loss=0.183976 (Loss più basso), Accuarcy=0.922702; 25 Batch: Loss=0.553305, Accuarcy=0.923452; 50 Batch: Loss=0.737575, Accuarcy=0.231895.
+Successivamente è stata introdotta anche la regolarizzazione L2 (lasso) per cercare di evitare l’Overfitting. sono stati usati 3 Hidden Layer, mantenendo invariato il resto degli Iper-Parametri. Il modello è stato eseguito con Batch Size di 10 e numero di epoche pari a 100.  Il risultato comunque non è stato soddisfacente, con Accuracy di 0.64 e Loss di 5.63.
+In fine, si è usata la RandomizedSearchCV per ottenere i migliori Iper-Parametri, cercando nei domini: numero di Layers da uno a sei; numero di Hidden Layers da 2 a 10 e 25, 50 e 100; funzione di attivazione 'relu' e 'Hyperbolic Tangent'; modelli di ottimizzazione 'adam' e 'adagard'. Il miglior risultato si è ottenuto con: 'optimizer'='adagrad'; 'n layers'=5, 'h dim'=7; 'activation'='tanh'. I risultati sul Test Set 1 sono stati: Accuracy=0.97826; Loss=0.156431. E sul Test Set 2: Accuracy=0.926887; Loss=0.217802. Risultati comunque peggiori di altri modelli.
 
 
 
-
-% SECONDA DELIVERY
 
 
 \section{Task 3 - Time Series Analysis and Forecasting/Classification}
 
-L'attributo 'date' è costituito da valori del tempo rilevati ogni minuto ma sono presenti diversi valori dove anziché all'istante del minuto preciso è stato osservato il valore un secondo prima (es. 17:51:59 anziché 17:52:00). Si tratta di un piccolo chiaro errore di rilevazione che potrebbe inficiare l'analisi sulle serie temporali e quindi tutti i valori con 59 secondi sono stati corretti mediante il loro Offset di 1 secondo in avanti, sia nel Training che nei due Test Set. Il primo Test Set contiene rilevazioni temporalmente precedenti al Training ed il secondo Test Set rilevazioni successive. Il termine del primo Test Set non coincide con l'inizio del Training e la fine di quest'ultimo non coincide con l'inizio del secondo Test (ci sono diverse ore di distanza tra i tre). %Per questo non è stato possibile unire i tre dataset in un unico più grande che sarebbe potuto servire per le analisi sulle singole Time Series, che sono state dunque eseguite sul Training Set. % Comunque si riporta quì il grafico della Time Series composta dai tre dataset, dove i valori mancanti sono stati posti pari all'ultimo valore disponibile, approssimata mediante la tecnica che è risultata migliore, la .......
+L'attributo 'date' è costituito da valori del tempo rilevati ogni minuto ma sono presenti diversi valori dove anziché all'istante del minuto preciso è stato osservato il valore un secondo prima (es. 17:51:59 anziché 17:52:00). Si tratta di un piccolo chiaro errore di rilevazione che potrebbe inficiare le analisi e quindi tutti i valori con 59 secondi sono stati corretti mediante il loro Offset di 1 secondo in avanti, sia nel Training che nei due Test Set. Il primo Test Set contiene rilevazioni temporalmente precedenti al Training ed il secondo Test Set contiene rilevazioni successive. Il termine del primo Test Set non coincide con l'inizio del Training e la fine di quest'ultimo non coincide con l'inizio del secondo Test (ci sono diverse ore di distanza tra i tre). E' stato prodotto un dataset costituito dall'unione dei tre, interpolando l'ultimo ed il primo valore di ciascun dataset contiguo. %, ma per le analisi svolte in questo capitolo è stato usato il Training Set per questioni di complessità computazionale e per evitare problemi derivanti dall'uso di valori aggiunti artificiosamente. Si riporta quì il grafico della Time Series composta dai tre dataset, approssimata mediante la tecnica che è risultata migliore, la .......
+
+
+\subsection{Shapelet and Motif Discovery}
+
+\noindent L'intero dataset è stato rappresentato ponendo sulle ascisse i 5 attributi presenti (in ordine da 0 a 4: 'Temperature'=0.0, 'Humidity'=1.0, 'Light'=2.0, 'CO2'=3.0, 'Humidity Ratio'=0.4) e sulle ordinate il range di valori per tutti questi attributi. Si sono rappresentate distintamente le istanze appartenenti alle due classi in output. Ogni istanza temporale è una linea nei grafici quì sotto. Nei due grafici di sinistra sono stati rappresentati tutti gli oggetti usando uno spessore piccolo per le linee, mentre nei due grafici di destra si è rappresentato un sample di 300 oggetti aumentando lo spessore delle linee.
+
+\begin{figure}[H] \centering
+\includegraphics[width=8cm]{shapelets/Figura1.png}
+\includegraphics[width=8cm]{shapelets/Figura2.png}
+\end{figure}
+
+
+\noindent \textbf{Shapelets}. I grafici sopra ci permettono già di apprezzare la 'Shape' tipica dei valori del dataset per le due classi in output. I valori più elevati di 'Light' (2.0) e 'CO2' (3.0) sono presenti per la maggior parte nei grafici riferiti alla classe 'Occupancy'=1. Le Shapelet sono state estratte usando l’algoritmo 'Shapelet Transform', testando la 'Window size' da 2 a 5 (come criterio per il punteggio è stato scelto ‘mutual information’). Le Shapelets risultanti sono quelle nella figura quì sotto a sinistra. Notiamo che le due sotto-sequenze temporali più rappresentative del dataset sono quelle che partono dagli indici di riga 1170 e 1164.  La parte di grafico più spessa rappresenta quella che più discrimina tra le classi in output. Nel grafico di sinistra si riporta dunque un dettaglio della stessa Shape, riferita solo ai primi tre attributi. E' chiaro che è l'attributo 'Light' quello che apporta il maggior grado di differenza tra le Shape delle classi in output.
+
+\begin{figure}[H] \centering
+\includegraphics[width=8cm]{shapelets/Figura16.png}
+\includegraphics[width=7cm]{shapelets/Figura15.png}
+\end{figure}
+
+\noindent \textbf{Motifs}. Come attributo da analizzare è stato scelto ‘CO2’. Sono stati generati i grafici della serie temporale (Signal) e Matrix Profile.
+
+\begin{wrapfigure}[10]{r}{0.5\textwidth}
+\includegraphics[width=10cm]{shapelets/Figura3.png}
+\end{wrapfigure}
+
+\noindent Dopo alcuni test un valore efficiente per l'Iper-Parametro 'Window Size' è stato 800. Questo valore permette di catturare solo le Anomalie e i Motifs interessanti, escludendo i dettagli irrilevanti (white noise). I picchi nella matrix profile coincidono con le anomalie mentre i valori vicini a 0 coincidono con i Motifs. Successivamente sono stati cercati i Motifs più frequenti, che si riportano nei grafici quì sotto.
+\\ \\
+
+
+\begin{figure}[H]
+\begin{tabular}{ m{8cm} m{4cm} m{4cm} }
+\includegraphics[width=8cm]{shapelets/Figura4.png}
+&
+\includegraphics[width=4cm]{shapelets/Figura5.png}
+\includegraphics[width=4cm]{shapelets/figura6.png}
+&
+\includegraphics[width=4cm]{shapelets/Figura7.png}
+\end{tabular}
+\end{figure}
+
+\noindent Per confronto, si riportano anche i risultati ottenuti con una 'Window Size' di 200, che sono comunque interessanti.
+
+\begin{figure}[H]
+\begin{tabular}{  m{8cm} m{4cm} m{4cm} }
+\includegraphics[width=8cm]{shapelets/Figura8.png}
+&
+\includegraphics[width=4cm]{shapelets/Figura11.png}
+\includegraphics[width=4cm]{shapelets/Figura10.png}
+&
+\includegraphics[width=4cm]{shapelets/Figura9.png}
+\includegraphics[width=4cm]{shapelets/Figura12.png}
+\end{tabular}
+\end{figure}
+
+
+\noindent \textbf{Le anomalie} sono state estratte usando una 'Window Size' di 800, figura in basso a sinistra, e una 'Window Size' di 200, figura in basso a destra. È interessante osservare che l'area rimane la stessa (si contrae soltanto).
+
+\begin{figure}[H] \centering
+\includegraphics[width=7cm]{shapelets/Figura13.png}
+\includegraphics[width=7cm]{shapelets/Figura14.png}
+\end{figure}
+
+\subsection{Similarities}
+
+Il training set parte dalla data "2015-02-04 17:51:00" e termina con "2015-02-10 09:33:00". Abbiamo deciso di analizzare e confrontare le diverse giornate che sono contenute nel training, ma solo quelle i cui dati sono stati rilevati per l'intera giornata, per questo abbiamo escluso la prima e l'ultima giornata. I 5 giorni analizzati partono dal giovedì e arrivano al lunedì successivo. Possiamo notare che nelle giornate di sabato (7-02) e domenica (8-02) per le variabili "CO2" e "Light" vi sono valori e andamenti differenti. Per la prima in entrambe le giornate i valori sono costanti per tutto l'arco temporaneo, nella seconda l'andamento tra i giorni infrasettimanali, il sabato e la domenica sono completamente differenti. Nella seconda possiamo notare un picco minimo nella fascia oraria 13:20, quindi orario di pranzo. Questo probabilmente dipende dal fatto che le stanze in questione sono uffici e il fine settimana questi sono chiusi. Questa teoria è confermata dal fatto che in queste giornate l'Occupancy assume solo il valore 0.
+\begin{figure}[H] \centering %da cancellare nella consegna definitiva
+\includegraphics[width=8cm]{TS-R/CO2.png}
+\includegraphics[width=8cm]{TS-R/Light.png}
+\end{figure}
+\noindent Le altre variabili non presentano questa grossa differenza tra i giorni infrasettimanali e quelli del fine settimana perché dipendono maggiormente dall'ambiente esterno. Proprio per questa ragione abbiamo deciso, dopo svariate prove, di selezionare le giornate "2015-02-06", ovvero Venerdì, e "2015-02-09", Lunedì, per verificare la similarità fra il primo giorno feriale e l'ultimo. La differenza tra giorno feriale e festivo sarebbe eccessiva, e quindi può essere più interessante questo tipo di analisi.\\
+ 
+\noindent \textbf{Transformations: } dopo aver applicato le diverse tecniche di trasformazione alle giornate precedentemente selezionate e alle diverse variabili si è deciso di utilizzare le seguenti trasformazioni e attributi : 1) "Light", non trasformata; 2) "CO2" -> Amplitude Scaling; 3) "HumidityRatio"-> Trend removal, con valore del parametro "window" pari a 1. Vedremo solo i risultati interessanti ottenuti con queste serie temporali.
+
+\noindent \textbf{Time Series Approximation: } Abbiamo applicato tre diverse tecniche di approssimazione, alle serie temporali ottenute, modificando i parametri cercando di ottenere delle approssimazioni il più simili possibile. Ora vedremo le tre risultati ottenuti della variabile "Light" per osservare le differenze.
+\begin{figure}[H]
+\begin{tabular}{ m{6cm} m{6cm} m{6cm} }
+\includegraphics[width=5.5cm]{TS-R/lpaa.png}
+&
+\includegraphics[width=5.5cm]{TS-R/lsax.png}
+&
+\includegraphics[width=5.5cm]{TS-R/l1dsax.png}
+\end{tabular}
+\end{figure}
+\noindent Possiamo notare che la SAX approximation non riesce ad approssimare in maniera ottimale le due serie. Invece possiamo affermare che quella che riesce ad approssimarle al meglio è la PAA, anche con valori inferiori a quello utilizzato per creare questo plot. Questo discorso vale anche per le altre due variabili.\\
+
+\noindent \textbf{Clustering: } stiamo finendo di calcolare i vari cluster.
 
 \subsection{Forecasting}
 
@@ -644,7 +830,7 @@ Sono state osservate tutte le Time Series di ciascun attributo ed è stata scelt
 \includegraphics[width=9cm]{forecast/TS Temperature.png}
 \end{wrapfigure}
 
-\noindent La varianza della serie rimane abbastanza stabile al variare del tempo, ma per alcune giornate la differenza termica è importante, ad esempio tra il 2015-02-07 ed il 2015-02-08. Il Dickey-Fuller Test per la verifica della stazionarietà indica che la serie non è propriamente stazionaria: Test Statistic = -2.69; Critical Value (1\%) = -3.43; Critical Value (5\%) = -2.86; Critical Value (10\%) = -2.57. E' stato quindi deciso di generare un'altra serie rendendo stazionaria quella iniziale, al fine di usarla per i modelli che necessitino della stazionarietà. La varianza è stata ridotta mediante una trasformazione logaritmica della Time Series (ciascun valore diventa il logaritmo naturale del valore originale) ed il trend è stato eliminato sottraendo a ciascun valore la media mobile a 300 periodi (cioè il valore medio della temperatura nelle 5 ore precedenti). La nuova serie è stazionaria: il Test Statistics del Dickey-Fuller Test passa a -3.88, inferiore a tutti i Critical Value per ogni confidenza (già riportati sopra). Dal grafico della Partial Autocorrelation della serie si intuisce che essa potrebbe essere approssimata da un modello autoregressivo di ordine 4.
+\noindent La varianza della serie rimane abbastanza stabile al variare del tempo, ma per alcune giornate la differenza termica è importante, ad esempio tra il 2015-02-07 ed il 2015-02-08. Il Dickey-Fuller Test per la verifica della stazionarietà indica che la serie non è propriamente stazionaria: Test Statistic = -2.69; Critical Value (1\%) = -3.43; Critical Value (5\%) = -2.86; Critical Value (10\%) = -2.57. E' stato quindi deciso di generare un'altra serie rendendo stazionaria quella iniziale, al fine di usarla per i modelli che necessitino della stazionarietà. La varianza è stata ridotta mediante una trasformazione logaritmica della Time Series (ciascun valore diventa il logaritmo naturale del valore originale) ed il trend è stato eliminato sottraendo a ciascun valore la media mobile a 300 periodi (cioè il valore medio della temperatura nelle 5 ore precedenti). La nuova serie è stazionaria: il Test Statistics del Dickey-Fuller Test passa a -3.88, inferiore a tutti i Critical Value per ogni confidenza (già riportati sopra). Il grafico della Autocorrelation cala esponenzialmente mentre quello della Partial Autocorrelation ha i primi 4 valori rilevanti e poi si inverte. Da ciò si deduce che la Time Series potrebbe essere approssimata da un modello autoregressivo (AR) di ordine 4.
 
 \begin{figure}[H]\centering
 \includegraphics[width=9cm]{forecast/TS Temperature Stationary.png}
@@ -661,31 +847,8 @@ Sono state osservate tutte le Time Series di ciascun attributo ed è stata scelt
 \includegraphics[width=9cm]{forecast/Holt Forecast.png}
 \end{wrapfigure}
 
-\noindent Anche questo metodo non produce buone predizioni su dati con stagionalità ma permette Forecast più accurati su dati con trend, quindi è stato testato sulla Time Series originale non stazionaria. Con valori degli Iper-Parametri Smoothing Level = 0.01 e Smoothing Slope = 0.1 riesce a catturare l'inversione di trend nella parte finale della TS. Il coefficiente R2 è comunque ancora vicino a 0. \newline
+\noindent Anche questo metodo non produce buone predizioni su dati con stagionalità ma permette Forecast su dati con trend, quindi è stato testato sulla Time Series originale non stazionaria. Con valori degli Iper-Parametri Smoothing Level = 0.01 e Smoothing Slope = 0.1 riesce a catturare l'inversione di trend nella parte finale della TS. Il coefficiente R2 è comunque ancora vicino a 0. \newline
 
-\noindent \textbf{ARIMA}: Come suggerito dal grafico della PACF il miglior modello ARIMA per i dati ha Autoregressione di ordine 4 e Media Mobile di ordine 1: ARIMA(4, 0, 1). Nonostante il modello ARIMA funzioni solo su serie stazionarie e non predica la stagionalità, esso riesce a catturare molto bene l'inversione di trend e un accenno di stagionalità sulla serie originale (va tenuto presente che anche la serie originale è abbastanza stazionaria). In questi termini il modello predice dove si sposterà la media della serie e con che velocità lo farà.
-
-\begin{tabular}{ m{5cm} m{0cm} }
-
-\begin{tabular}{ | m{1.7cm} | m{1.2cm} | } 
-\hline
-R2 & 0.3479 \\
-\hline
-MAE & 0.608 \\
-\hline
-MAD & 0.548 \\
-\hline
-\end{tabular}
-
-&
-
-\begin{figure}[H]
-\includegraphics[width=11cm]{forecast/ARIMA Forecast.png}
-\end{figure}
-
-\end{tabular}
-
-\noindent 
 
 \noindent \textbf{Exponential Smoothing}: Data l'accentuata stagionalità nei dati, con periodi giornalieri, è stato prodotto un modello basato su 1440 periodi (1 giorno in minuti), in modo da catturare il pattern tipico della temperatura giornaliera. I risultati dell'Exponential Smoothing stagionale sono i migliori tra i modelli testati (molto probabilmente il modello SARIMAX avrebbe prodotto risultati altrettanto soddisfacenti ma il test di un modello SARIMAX(4, 0, 1, 1440) risulta computazionalmente troppo complesso).
 
@@ -714,25 +877,74 @@ MAD & 0.0078 \\
 \begin{figure}[H]
 \includegraphics[width=13.5cm]{forecast/Exponential Smoothing Forecast.png}
 \end{figure}
-
 \end{tabular}
 
 
+\noindent \textbf{ARIMA}: Come suggerito dal grafico della PACF il miglior modello ARIMA per i dati ha Autoregressione di ordine 4 e Media Mobile di ordine 1: ARIMA(4, 0, 1). Nonostante il modello ARIMA funzioni solo su serie stazionarie e non predica la stagionalità, esso restituisce risultati apprezzabili sulla serie originale (va tenuto presente che anche la serie originale è abbastanza stazionaria). In particolare il modello predice dove si sposterà la media della serie e con che velocità lo farà.
 
+\begin{tabular}{ m{5cm} m{0cm} }
 
+\begin{tabular}{ | m{1.7cm} | m{1.2cm} | } 
+\hline
+R2 & 0.3479 \\
+\hline
+MAE & 0.608 \\
+\hline
+MAD & 0.548 \\
+\hline
+\end{tabular}
 
+&
 
+\begin{figure}[H]
+\includegraphics[width=11cm]{forecast/ARIMA Forecast.png}
+\end{figure}
 
+\end{tabular}
 
-
-
-
+\noindent 
 
 
 
 \subsection{Time Series Classification}
 
-\noindent \textbf{Shaplet based classifier}:
+\subsubsection{Shaplet and Feature based Classifier}
+
+La Classification basata su Shaplet e Features è stata condotta sia con il dataset normalizzato (con la Min Max Normalization) che con quello originale. I risultati migliori sono stati ottenuti senza normalizzazione, quindi vengono discussi quelli. Le metriche di Test vengono riportate tutte nella tabella in basso.
+
+\noindent \textbf{Shaplet based Classifier}: il metodo 'grabocka' ha suggerito un numero di 4 dimensioni per eseguire la classificazione basata sulle shapelet. Come 'optimizer' è stato usato Adagard, con 'learning rate'=0.01 e regolarizzione L2 di 0.1.
+
+\noindent \textbf{Shapelet Distances based Classifier}. Training e Test Set sono stati trasformati in un array che ha per dimensione il numero delle Shapelets. Il modello è stato testato su tre diversi Classifier: Decision Tree, KNN e Logistic Regression.
+
+\noindent \textbf{Feature Based Classifier}. Sono state calcolate diverse statistiche per ogni attributo, tipo Curtosi, Deviazione Standard, Media, Varianza, ecc. Queste statistiche sono state vettorizzate e usate come input per gli stessi tre classifier: Decision Tree, KNN e Logistic Regression.
+
+\begin{center}
+\begin{tabular}{ | m{7cm} | m{2cm} | m{2cm} | m{2cm} | } 
+\hline
+Classifier/Metrics & Accuracy & F1 class 0 & F1 class 1 \\
+\hline
+Shapelet & 0.72 & 0.82 & 0.40 \\
+\hline
+Shapelet Distances based KNN & 0.94 & 0.95 & 0.92 \\
+\hline
+Shapelet Distanecs Based DT & 0.91 & 0.93 & 0.86 \\
+\hline
+Shapelet Distanecs Based LR & 0.93 & 0.95 & 0.91 \\
+\hline
+Structure (Feature) Based KNN & 0.87 & 0.90 & 0.84 \\
+\hline
+Structure (Feature) Based DT & 0.98 & 0.98 & 0.97 \\
+\hline
+Structure (Feature) Based LR & 0.98 & 0.98 & 0.97 \\
+\hline
+\end{tabular}
+\end{center}
+
+\noindent I risultati migliori sono quelli dei modelli Feature Based, ma comunque non superano le performance viste nei capitoli precedenti.
+
+
+\subsubsection{CNN and RNN}
+
 
 \noindent \textbf{Convolutional Neural Network}:
 
@@ -743,33 +955,71 @@ MAD & 0.0078 \\
 
 \section{Task 5 - Outlier Detection and Explainability}
 
-Sono già state usate diverse tecniche di Machine Learning per trovare gli Outliers in termini di classe minoritaria in output ('Occupancy' = 1). Devono essere invece trovati gli Outlier degli altri attributi (tutti numerici). Non avendo quindi più bisogno di nessun datset di test sono stati uniti i due forniti al training set per generare un DataFrame più grande su cui trovare gli Outliers. Il dataset di Test 1 è stato posto prima del dataset di training ed il dataset di Test 2 è stato posto dopo, per rispettare le precedenze temporali. In questo caso è possibile fare ciò senza ulteriori modifiche perché, a differenza dei task sulle time series, non c'è bisogno che le rilevazioni dei valori siano continuative nel tempo ed a frequenza constante. Il nuovo dataset è costituito da 20560 oggetti.
+Sono stati uniti i due datset di test al training set per generare un DataFrame più grande su cui trovare gli Outliers. Il Test Set 1 è stato posto prima del Training Set ed il Test Set 2 è stato posto dopo, per rispettare le precedenze temporali. Il nuovo dataset è costituito da 20560 oggetti.
 \\
 
-\begin{wrapfigure}[10]{r}{0.5\textwidth}
+\noindent \textbf{BoxPlot}: I BoxPlot degli attributi 'Light' e 'CO2' sono già stati rappresentati nella fase iniziale di Data Understanding. Per l'attributo 'Light' il 99-esimo percentile è il valore 744. Cioè l'1\% delle istanze del dataset, che corrispondono a 205 oggetti, ha un valore dell'attributo 'Light' superiore a 744 (questi sono l'1\% degli Outliers). Non esistono invece Outliers per i valori bassi dell'attributo perché il valore più basso, che è 0, costituisce da solo il 62\% dei valori dell'attributo. 
+
+\begin{wrapfigure}[12]{r}{0.5\textwidth} \centering
 \includegraphics[width=7cm]{outliers_Lorenzo/Light_Outliers.png}
 \end{wrapfigure}
 
-
-\noindent \textbf{BoxPlot}: i BoxPlot degli attributi 'Light' e 'CO2' sono già stati rappresentati nella fase iniziale di Data Understanding. Per l'attributo 'Light' il 99-esimo percentile è il valore 744. Cioè l'1\% delle istanze del dataset (che corrispondono a 205 oggetti) ha un valore dell'attributo 'Light' superiore a 744. Questi sono l'1\% degli Outlier. Non esistono invece outliers per i valori bassi dell'attributo perché il valore più basso, 0, costituisce da solo il 62\% dei valori dell'attributo.
-
-
-
+\noindent Questi Outliers discriminano molto bene nella classe in output: 202 di essi hanno valore di 'Occupancy' pari a 1 e solo 3 oggetti hanno un valore di 0. Questi 3 oggetti sono anomalie del datset : a fronte di valori di 'Light' intorno a 800 e 1500, che farebbero presupporre l'occupazione della stanza, questa in effetti non è occupata. Questi 3 oggetti si riferiscono a tre minuti consecutivi dalle 09:42:00 alle 09:44:00 del giorno 2015-02-07. I valori degli altri attributi sono tutti nella norma. Essendo pochi oggetti è possibile che si tratti di errori di rilevazione ma si è avanzata anche l'ipotesi che il soggetto non fosse ancora giunto nella stanza quando la luce esterna è aumentata.
 
 \subsection{Clustering and Density Based Outliers Detection}
 
-\noindent \textbf{DBSCAN}: 
+\noindent \textbf{DBSCAN}: Sono state calcolate le distanze di Manhattan di ciascun oggetto dal suo quinto punto più vicino ed è stato rappresentato il grafico di queste distanze ordinate. Come si nota tutti gli oggetti con valori canonici si trovano ad una distanza tra 0 e 25 dal quinto oggetto più vicino, mentre quelli che si presuppone siano Outliers hanno una distanza maggiore.
 
-\begin{wrapfigure}[9]{r}{0.5\textwidth}
+\begin{wrapfigure}[12]{r}{0.5\textwidth} \centering
 \includegraphics[width=7cm]{outliers_Lorenzo/distances_from_5th_neighbor.png}
 \end{wrapfigure}
 
-\noindent Sono state calcolate le distanze di Manhattan di ciascun oggetto dal suo quinto punto più vicino ed è stato rappresentato il grafico di queste distanze ordinate. Come si nota tutti gli oggetti con valori canonici si trovano ad una distanza tra 0 e 25 dal quinto oggetto più vicino, mentre quelli che si presuppone siano Outliers hanno una distanza maggiore. Dunque il DBSCAN è stato eseguito con Iper-Parametri: 'min samples' = 5 ed 'eps' = 25. Gli Outliers sono 52 oggetti a cui è stata associata la label -1 dal modello. Di questi solo 12 hanno il valore di 'Light' maggiore di 744, che è pari in media ad un valore molto più alto, 1230. Questo significa che 193 dei 205 Outliers specifici del singolo attributo 'Light' in realtà non sono Outliers di tutto il dataset, perché gli Outliers effettivi sono quelli che hanno congiuntamente 'CO2' e 'Light' elevati. Infatti i 52 Outliers ottenuti con il DBSCAN hanno valori medi nella norma per tutti gli attributi tranne che per 'Light' e soprattutto per 'CO2', pari rispettivamente a 554.25 e 1026. Questo risultato può essere dedotto anche dalle distribuzioni degli attributi: 'CO2' e 'Light' sono i due attributi che più di tutti presentano un marcato addensamento di frequenze nella parte bassa delle distribuzioni e pochissimi oggetti per i valori alti, che vanno a costituire appunto gli Outliers.
+\noindent Dunque il DBSCAN è stato eseguito con Iper-Parametri: 'min samples' = 5 ed 'eps' = 25. Gli Outliers sono 52 oggetti a cui è stata associata la label -1 dal modello. Di questi solo 12 hanno il valore di 'Light' maggiore di 744, che è pari in media ad un valore molto più alto, 1230. Questo significa che 193 dei 205 Outliers specifici del singolo attributo 'Light' in realtà non sono Outliers di tutto il dataset, perché gli Outliers effettivi sono quelli che hanno congiuntamente 'CO2' e 'Light' elevati. Infatti i 52 Outliers ottenuti con il DBSCAN hanno valori medi nella norma per tutti gli attributi tranne che per 'Light' e soprattutto per 'CO2', pari rispettivamente a 554.25 e 1026. Questo risultato può essere dedotto anche dalle distribuzioni degli attributi: 'CO2' e 'Light' sono i due attributi che più di tutti presentano un marcato addensamento di frequenze nella parte bassa delle distribuzioni e pochissimi oggetti per i valori alti, che vanno a costituire appunto gli Outliers. Questi Outliers non discriminano tra le classi in output, 27 hanno classe 0 e 25 hanno classe 1.
 \\
 
-\noindent \textbf{LOF}:
+\noindent \textbf{X-Means}:
+
+\begin{wrapfigure}[10]{r}{0.5\textwidth}
+\includegraphics[width=7cm]{outliers_Lorenzo/X-Means.png}
+\end{wrapfigure}
+
+\noindent Sono state eseguite diverse prove dell'algoritmo X-Means (tecnica di Clustering avanzato e non di Outlier Detection). I risultati sono diversi ad ogni ogni prova a causa della caratteristica randomica dell'algoritmo, ma il risultato in generale è quello riportato in figura. Questo metodo non rileva prettamente gli Outliers. Vengono solo associati cluster diversi da quelli principali agli oggetti con valori elevati di 'Light' e 'CO2'.
+\\
+
+\noindent \textbf{LOF}: Il livello di LOF che discrimina tra Inliers ed Outliers è 2.344 (gli Outliers hanno un LOF superiore a questo Thershold). Il LOF più basso ottenuto è 0.9229 e quello più alto è 24.1017. La linea verticale in figura marchia il confine fra Outlier e Inlier.
+
+\begin{figure}[H]\centering
+\includegraphics[width=6cm]{outliers_Lorenzo/LOF1.png}
+\end{figure}
+
+
 
 \subsection{Distance and Angle Based Outliers Detection}
+
+\noindent \textbf{ABOD}. Avendo fatto tanti esperimenti con i parametri, è stato scelto 20 come il numero degli neighbor. L’algoritmo  ha identificato 20365 inlier e 195 outlier assegnando ad ogni punto nello spazio vettoriale un punteggio. I punteggi con i valori più alti sono considerati inlier mentre quelli con i score bassi sono considerati l’inlier. Il punteggio assegnato ai nostri punti era nell’intervallo fra -254534.0193 e -7.2802e-13, mentre il punteggio sopra cui i valori erano considerati outlier era quello di -2.7557-06. Nella figura 1 possiamo osservare
+
+
+\noindent \textbf{KNN}.  Sono state calcolate le distanze per ogni punto sommando le distanze dal  dato punto fino ai suoi 5 nearest neighbor. L’ 1\% dei punti con il punteggio più alto sono considerati gli outlier. Dato che la maggioranza dei punti (99,99\%) prendeva il punteggio intorno a 0 mentre la minorità raggiungeva i valori più alti di 600, la dataset è dovuta essere normalizzata per la facilitata interpretazione visuale. I risultati possono essere osservati nella figura 1, dove la linea verticale rappresenta il punto sopra cui i valori sono considerati gli outlier. Nella figura 2 comunque, vediamo un'altra rappresentazione visiva degli outlier della dataset non-normalizzata. I punti rossi (1) rappresentano gli outlier, e si può osservare che si di solito trovano significativamente sopra il valore di 20.2020, mentre  tutti gli inlier (0, verde) sono inferiori a questo valore.  La larghezza dei cerchi rappresenta l’altezza del punteggio che si può osservare nel assi x, mentre la assi y rappresenta l’indice dei valori nella dataset.
+
+\begin{figure}[H]\centering
+\includegraphics[width=6cm]{outliers_Ema/Figure 1.png}
+\includegraphics[width=5cm]{outliers_Ema/Figure 2.png}
+\end{figure}
+
+
+\noindent \textbf{AutoEncoder} è stato usato come l’ultimo metodo del outlier detection. Il numero delle epoche scelto era 10, la funzione di attivazione nascosta scelta era relu, mentre la funzione di attivazione del output scelta era sigmoidea,  e i strati nascosti erano di [5,3,2,3,5] layers. È stata estratta la distribuzione probabilistica che rappresenta la probabilità che il campione sia l’outlier.  La prima  e la seconda dimensione dell’array ottenuto rappresentano la probabilità che un campione sia l’inlier o l’outlier, rispettivamente. Nelle Figure 4 e 5 possiamo osservare la rappresentazione visiva di questi due array e la relativamente altà correlazione fra di loro, rispettivamente. Finalmente, nelle figure 6 e 7è presente la distribuzione di frequenza del punteggio che determina se una variabile sia l’outlier, con la densità rappresentata sulla assi y della figura 7, e il numero assoluto degli outlier  rappresentato sulla assi y della figura 6.
+
+\begin{figure}[H] \centering
+\begin{tabular}{ m{4cm} m{4cm} m{4cm} m{4cm} }
+\includegraphics[width=4cm]{outliers_Ema/Figure 4.png}
+&
+\includegraphics[width=4cm]{outliers_Ema/Figure 5.png}
+&
+\includegraphics[width=4cm]{outliers_Ema/Figure 6.png}
+&
+\includegraphics[width=4cm]{outliers_Ema/Figure 7.png}
+\end{tabular}
+\end{figure}
 
 
 \end{document}
