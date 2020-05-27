@@ -734,12 +734,38 @@ In fine, si è usata la RandomizedSearchCV per ottenere i migliori Iper-Parametr
 
 \section{Task 3 - Time Series Analysis and Forecasting/Classification}
 
-L'attributo 'date' è costituito da valori del tempo rilevati ogni minuto ma sono presenti diversi valori dove anziché all'istante del minuto preciso è stato osservato il valore un secondo prima (es. 17:51:59 anziché 17:52:00). Si tratta di un piccolo chiaro errore di rilevazione che potrebbe inficiare le analisi e quindi tutti i valori con 59 secondi sono stati corretti mediante il loro Offset di 1 secondo in avanti, sia nel Training che nei due Test Set. Il primo Test Set contiene rilevazioni temporalmente precedenti al Training ed il secondo Test Set contiene rilevazioni successive. Il termine del primo Test Set non coincide con l'inizio del Training e la fine di quest'ultimo non coincide con l'inizio del secondo Test (ci sono diverse ore di distanza tra i tre). E' stato prodotto un dataset costituito dall'unione dei tre, interpolando l'ultimo ed il primo valore di ciascun dataset contiguo. %, ma per le analisi svolte in questo capitolo è stato usato il Training Set per questioni di complessità computazionale e per evitare problemi derivanti dall'uso di valori aggiunti artificiosamente. Si riporta quì il grafico della Time Series composta dai tre dataset, approssimata mediante la tecnica che è risultata migliore, la .......
+L'attributo 'date' è costituito da valori del tempo rilevati ogni minuto ma sono presenti diversi valori dove anziché all'istante del minuto preciso è stato osservato il valore un secondo prima (es. 17:51:59 anziché 17:52:00). Si tratta di un piccolo chiaro errore di rilevazione che potrebbe inficiare le analisi e quindi tutti i valori con 59 secondi sono stati corretti mediante il loro Offset di 1 secondo in avanti, sia nel Training che nei due Test Set. Il primo Test Set contiene rilevazioni temporalmente precedenti al Training ed il secondo Test Set contiene rilevazioni successive. Il termine del primo Test Set non coincide con l'inizio del Training e la fine di quest'ultimo non coincide con l'inizio del secondo Test (ci sono diverse ore di distanza tra i tre).
+
+
+\subsection{Similarities}
+
+Il training set parte dalla data "2015-02-04 17:51:00" e termina con "2015-02-10 09:33:00". Abbiamo deciso di analizzare e confrontare le diverse giornate che sono contenute nel training, ma solo quelle i cui dati sono stati rilevati per l'intera giornata, per questo abbiamo escluso la prima e l'ultima giornata. I 5 giorni analizzati partono dal giovedì e arrivano al lunedì successivo. Possiamo notare che nelle giornate di sabato (7-02) e domenica (8-02) per le variabili "CO2" e "Light" vi sono valori e andamenti differenti. Per la prima in entrambe le giornate i valori sono costanti per tutto l'arco temporaneo, nella seconda l'andamento tra i giorni infrasettimanali, il sabato e la domenica sono completamente differenti. Nella seconda possiamo notare un picco minimo nella fascia oraria 13:20, quindi orario di pranzo. Questo probabilmente dipende dal fatto che le stanze in questione sono uffici e il fine settimana questi sono chiusi. Questa teoria è confermata dal fatto che in queste giornate l'Occupancy assume solo il valore 0.
+\begin{figure}[H] \centering %da cancellare nella consegna definitiva
+\includegraphics[width=8cm]{TS-R/CO2.png}
+\includegraphics[width=8cm]{TS-R/Light.png}
+\end{figure}
+\noindent Le altre variabili non presentano questa grossa differenza tra i giorni infrasettimanali e quelli del fine settimana perché dipendono maggiormente dall'ambiente esterno. Proprio per questa ragione abbiamo deciso, dopo svariate prove, di selezionare le giornate "2015-02-06", ovvero Venerdì, e "2015-02-09", Lunedì, per verificare la similarità fra il primo giorno feriale e l'ultimo. La differenza tra giorno feriale e festivo sarebbe eccessiva, e quindi può essere più interessante questo tipo di analisi.\\
+ 
+\noindent \textbf{Transformations: } dopo aver applicato le diverse tecniche di trasformazione alle giornate precedentemente selezionate e alle diverse variabili si è deciso di utilizzare le seguenti trasformazioni e attributi : 1) "Light", non trasformata; 2) "CO2" -> Amplitude Scaling; 3) "HumidityRatio"-> Trend removal, con valore del parametro "window" pari a 1. Vedremo solo i risultati interessanti ottenuti con queste serie temporali.
+
+\noindent \textbf{Time Series Approximation: } Abbiamo applicato tre diverse tecniche di approssimazione, alle serie temporali ottenute, modificando i parametri cercando di ottenere delle approssimazioni il più simili possibile. Ora vedremo le tre risultati ottenuti della variabile "Light" per osservare le differenze.
+\begin{figure}[H]
+\begin{tabular}{ m{6cm} m{6cm} m{6cm} }
+\includegraphics[width=5.5cm]{TS-R/lpaa.png}
+&
+\includegraphics[width=5.5cm]{TS-R/lsax.png}
+&
+\includegraphics[width=5.5cm]{TS-R/l1dsax.png}
+\end{tabular}
+\end{figure}
+\noindent Possiamo notare che la SAX approximation non riesce ad approssimare in maniera ottimale le due serie. Invece possiamo affermare che quella che riesce ad approssimarle al meglio è la PAA, anche con valori inferiori a quello utilizzato per creare questo plot. Questo discorso vale anche per le altre due variabili.\\
+
+\noindent \textbf{Clustering: } stiamo finendo di calcolare i vari cluster.
 
 
 \subsection{Shapelet and Motif Discovery}
 
-\noindent L'intero dataset è stato rappresentato ponendo sulle ascisse i 5 attributi presenti (in ordine da 0 a 4: 'Temperature'=0.0, 'Humidity'=1.0, 'Light'=2.0, 'CO2'=3.0, 'Humidity Ratio'=0.4) e sulle ordinate il range di valori per tutti questi attributi. Si sono rappresentate distintamente le istanze appartenenti alle due classi in output. Ogni istanza temporale è una linea nei grafici quì sotto. Nei due grafici di sinistra sono stati rappresentati tutti gli oggetti usando uno spessore piccolo per le linee, mentre nei due grafici di destra si è rappresentato un sample di 300 oggetti aumentando lo spessore delle linee.
+\noindent Questo task è stato svolto sul Training Set, che è stato rappresentato nei quattro grafici quì sotto ponendo sulle ascisse i 5 attributi presenti (in ordine da 0 a 4: 'Temperature'=0.0, 'Humidity'=1.0, 'Light'=2.0, 'CO2'=3.0, 'Humidity Ratio'=0.4) e sulle ordinate il range di valori per tutti questi attributi. Si sono rappresentate distintamente le istanze appartenenti alle due classi in output. Ogni istanza temporale è una linea nei grafici quì sotto. Nei due grafici di sinistra sono stati rappresentati tutti gli oggetti usando uno spessore piccolo per le linee, mentre nei due grafici di destra si è rappresentato un sample di 300 oggetti aumentando lo spessore delle linee.
 
 \begin{figure}[H] \centering
 \includegraphics[width=8cm]{shapelets/Figura1.png}
@@ -747,7 +773,7 @@ L'attributo 'date' è costituito da valori del tempo rilevati ogni minuto ma son
 \end{figure}
 
 
-\noindent \textbf{Shapelets}. I grafici sopra ci permettono già di apprezzare la 'Shape' tipica dei valori del dataset per le due classi in output. I valori più elevati di 'Light' (2.0) e 'CO2' (3.0) sono presenti per la maggior parte nei grafici riferiti alla classe 'Occupancy'=1. Le Shapelet sono state estratte usando l’algoritmo 'Shapelet Transform', testando la 'Window size' da 2 a 5 (come criterio per il punteggio è stato scelto ‘mutual information’). Le Shapelets risultanti sono quelle nella figura quì sotto a sinistra. Notiamo che le due sotto-sequenze temporali più rappresentative del dataset sono quelle che partono dagli indici di riga 1170 e 1164.  La parte di grafico più spessa rappresenta quella che più discrimina tra le classi in output. Nel grafico di sinistra si riporta dunque un dettaglio della stessa Shape, riferita solo ai primi tre attributi. E' chiaro che è l'attributo 'Light' quello che apporta il maggior grado di differenza tra le Shape delle classi in output.
+\noindent \textbf{Shapelets}. I grafici sopra ci permettono già di apprezzare la 'Shape' tipica dei valori del dataset per le due classi in output. I valori più elevati di 'Light' (2.0) e 'CO2' (3.0) sono presenti per la maggior parte nei grafici riferiti alla classe 'Occupancy'=1. Le Shapelet sono state estratte usando l’algoritmo 'Shapelet Transform', testando la 'Window size' da 2 a 5 (come criterio per il punteggio è stato scelto ‘mutual information’). Come si nota dalla figura in basso a sinistra Le Shapelets risultanti sono le due sotto-sequenze temporali più rappresentative del dataset, che partono dagli indici di riga 1170 e 1164. La parte di grafico più spessa rappresenta quella che più discrimina tra le classi in output. Nel grafico di sinistra si riporta dunque un dettaglio del medesimo grafico riferito solo ai primi tre attributi. E' chiaro che è l'attributo 'Light' quello che apporta il maggior grado di differenza tra le Shapelets delle classi in output.
 
 \begin{figure}[H] \centering
 \includegraphics[width=8cm]{shapelets/Figura16.png}
@@ -790,119 +816,122 @@ L'attributo 'date' è costituito da valori del tempo rilevati ogni minuto ma son
 \end{figure}
 
 
-\noindent \textbf{Le anomalie} sono state estratte usando una 'Window Size' di 800, figura in basso a sinistra, e una 'Window Size' di 200, figura in basso a destra. È interessante osservare che l'area rimane la stessa (si contrae soltanto).
+\noindent \textbf{Le anomalie} sono state estratte usando una 'Window Size' di 800 (figura in basso a sinistra) e una 'Window Size' di 200 (figura in basso a destra). È interessante osservare che l'area rimane la stessa (si contrae soltanto).
 
 \begin{figure}[H] \centering
 \includegraphics[width=7cm]{shapelets/Figura13.png}
 \includegraphics[width=7cm]{shapelets/Figura14.png}
 \end{figure}
 
-\subsection{Similarities}
-
-Il training set parte dalla data "2015-02-04 17:51:00" e termina con "2015-02-10 09:33:00". Abbiamo deciso di analizzare e confrontare le diverse giornate che sono contenute nel training, ma solo quelle i cui dati sono stati rilevati per l'intera giornata, per questo abbiamo escluso la prima e l'ultima giornata. I 5 giorni analizzati partono dal giovedì e arrivano al lunedì successivo. Possiamo notare che nelle giornate di sabato (7-02) e domenica (8-02) per le variabili "CO2" e "Light" vi sono valori e andamenti differenti. Per la prima in entrambe le giornate i valori sono costanti per tutto l'arco temporaneo, nella seconda l'andamento tra i giorni infrasettimanali, il sabato e la domenica sono completamente differenti. Nella seconda possiamo notare un picco minimo nella fascia oraria 13:20, quindi orario di pranzo. Questo probabilmente dipende dal fatto che le stanze in questione sono uffici e il fine settimana questi sono chiusi. Questa teoria è confermata dal fatto che in queste giornate l'Occupancy assume solo il valore 0.
-\begin{figure}[H] \centering %da cancellare nella consegna definitiva
-\includegraphics[width=8cm]{TS-R/CO2.png}
-\includegraphics[width=8cm]{TS-R/Light.png}
-\end{figure}
-\noindent Le altre variabili non presentano questa grossa differenza tra i giorni infrasettimanali e quelli del fine settimana perché dipendono maggiormente dall'ambiente esterno. Proprio per questa ragione abbiamo deciso, dopo svariate prove, di selezionare le giornate "2015-02-06", ovvero Venerdì, e "2015-02-09", Lunedì, per verificare la similarità fra il primo giorno feriale e l'ultimo. La differenza tra giorno feriale e festivo sarebbe eccessiva, e quindi può essere più interessante questo tipo di analisi.\\
- 
-\noindent \textbf{Transformations: } dopo aver applicato le diverse tecniche di trasformazione alle giornate precedentemente selezionate e alle diverse variabili si è deciso di utilizzare le seguenti trasformazioni e attributi : 1) "Light", non trasformata; 2) "CO2" -> Amplitude Scaling; 3) "HumidityRatio"-> Trend removal, con valore del parametro "window" pari a 1. Vedremo solo i risultati interessanti ottenuti con queste serie temporali.
-
-\noindent \textbf{Time Series Approximation: } Abbiamo applicato tre diverse tecniche di approssimazione, alle serie temporali ottenute, modificando i parametri cercando di ottenere delle approssimazioni il più simili possibile. Ora vedremo le tre risultati ottenuti della variabile "Light" per osservare le differenze.
-\begin{figure}[H]
-\begin{tabular}{ m{6cm} m{6cm} m{6cm} }
-\includegraphics[width=5.5cm]{TS-R/lpaa.png}
-&
-\includegraphics[width=5.5cm]{TS-R/lsax.png}
-&
-\includegraphics[width=5.5cm]{TS-R/l1dsax.png}
-\end{tabular}
-\end{figure}
-\noindent Possiamo notare che la SAX approximation non riesce ad approssimare in maniera ottimale le due serie. Invece possiamo affermare che quella che riesce ad approssimarle al meglio è la PAA, anche con valori inferiori a quello utilizzato per creare questo plot. Questo discorso vale anche per le altre due variabili.\\
-
-\noindent \textbf{Clustering: } stiamo finendo di calcolare i vari cluster.
-
 \subsection{Forecasting}
 
-Sono state osservate tutte le Time Series di ciascun attributo ed è stata scelta quella relativa all'attributo 'Temperature' per eseguire questo task. La serie temporale presenta un leggero trend discendente dall'inizio fino al giorno 2015-02-08. Successivamente sembra stabilizzarsi o addirittura cominciare un'inversione di trend. E' presente un'evidente stagionalità che si ripete ogni 1440 minuti, cioè esattamente ogni giorno. Ciò è dovuto all'escursione termica tra il giorno e la notte: è evidente anche nel grafico che le temperature minime si hanno nelle ore notturne. 
+Questo task è stato eseguito sull'attributo 'Temperature'. La Time Series usata è stata generata unendo i valori dell'attributo nel Test Set 1 a quelli del Training Set (in quest'ordine per rispettare le precedenze temporali). Tra i due dataset intercorrono alcune ore, questi Missing Values sono stati riempiti con un'interpolazione (retta che collega l'ultimo valore del Test Set 1 al primo valore del Training Set). Inoltre sono stati eliminati i valori iniziali e finali in modo che la serie cominciasse e terminasse esattamente a mezzanotte (per 7 giorni, dal 2015-02-03 al 2015-02-09 compreso).
 
 \begin{wrapfigure}[11]{r}{0.5\textwidth}
 \includegraphics[width=9cm]{forecast/TS Temperature.png}
 \end{wrapfigure}
 
-\noindent La varianza della serie rimane abbastanza stabile al variare del tempo, ma per alcune giornate la differenza termica è importante, ad esempio tra il 2015-02-07 ed il 2015-02-08. Il Dickey-Fuller Test per la verifica della stazionarietà indica che la serie non è propriamente stazionaria: Test Statistic = -2.69; Critical Value (1\%) = -3.43; Critical Value (5\%) = -2.86; Critical Value (10\%) = -2.57. E' stato quindi deciso di generare un'altra serie rendendo stazionaria quella iniziale, al fine di usarla per i modelli che necessitino della stazionarietà. La varianza è stata ridotta mediante una trasformazione logaritmica della Time Series (ciascun valore diventa il logaritmo naturale del valore originale) ed il trend è stato eliminato sottraendo a ciascun valore la media mobile a 300 periodi (cioè il valore medio della temperatura nelle 5 ore precedenti). La nuova serie è stazionaria: il Test Statistics del Dickey-Fuller Test passa a -3.88, inferiore a tutti i Critical Value per ogni confidenza (già riportati sopra). Il grafico della Autocorrelation cala esponenzialmente mentre quello della Partial Autocorrelation ha i primi 4 valori rilevanti e poi si inverte. Da ciò si deduce che la Time Series potrebbe essere approssimata da un modello autoregressivo (AR) di ordine 4.
+\noindent La serie temporale presenta un leggero trend discendente dall'inizio fino al giorno 2015-02-08. Successivamente sembra stabilizzarsi o addirittura cominciare un'inversione di trend. E' presente un'evidente stagionalità che si ripete ogni 1440 minuti, cioè esattamente ogni giorno. Ciò è dovuto all'escursione termica tra il giorno e la notte: è evidente anche nel grafico che le temperature minime si hanno nelle ore notturne. La varianza della serie rimane abbastanza stabile al variare del tempo, ma per alcune giornate la differenza termica è importante, ad esempio tra il 2015-02-07 ed il 2015-02-08. Il Dickey-Fuller Test per la verifica della stazionarietà indica che la serie non è propriamente stazionaria: Test Statistic = -2.783; Critical Value (1\%) = -3.43; Critical Value (5\%) = -2.86; Critical Value (10\%) = -2.57. E' stato quindi deciso di generare un'altra serie rendendo stazionaria questa sopra, al fine di usarla per i modelli che necessitino della stazionarietà. La varianza è stata ridotta mediante una trasformazione logaritmica della Time Series (ciascun valore diventa il logaritmo naturale del valore originale) ed il trend è stato eliminato sottraendo a ciascun valore la media mobile a 300 periodi (cioè il valore medio della temperatura nelle 5 ore precedenti). La nuova serie è stazionaria: il Test Statistics del Dickey-Fuller Test passa a -4.617, inferiore a tutti i Critical Value per ogni confidenza. Il grafico della Autocorrelation cala esponenzialmente mentre quello della Partial Autocorrelation ha i primi 4 valori rilevanti e poi si inverte. Da ciò si deduce che la Time Series potrebbe essere approssimata da un modello autoregressivo (AR) di ordine 4.
 
 \begin{figure}[H]\centering
 \includegraphics[width=9cm]{forecast/TS Temperature Stationary.png}
 \includegraphics[width=7cm]{forecast/TS Temperature PACF.png}
 \end{figure}
 
-\noindent Per effettuare il forecasting la TS è stata suddivisa tenendo i primi 6129 valori come training e i successivi come test. In questo modo il test set comincia esattamente alla mezzanotte del 2015-02-09. \newline
+\noindent Per effettuare il forecasting la Time Series è stata suddivisa usando i valori dell'ultimo giorno (2015-02-09) come Test per i modelli applicati alla serie originale non stazionaria, e usando i valori dalle 10:00 dell'ultimo giorno fino alla fine come Test per i modelli applicati alla serie resa stazionaria.\newline
 
-\noindent \textbf{Simple Exponential Smoothing}: Essendo presente una chiara stagionalità il SES non può produrre una buona predizione. In ogni caso il modello è stato applicato sulla serie resa stazionaria facendo variare il valore dell'Iper-Parametro Alpha (lo Smoothing Level) nel range [0,1]. I risultati non variano molto, in generale la predizione graficamente risulta essere una semplice retta parallela, molto vicina alla media storica della TS. Infatti i Coefficienti di Determinazione sono vicini a 0 (un valore di R2 pari a 0 indica che il modello ha una Performance esattamente pari alla media). \newline
+\noindent \textbf{Simple Exponential Smoothing}: Essendo presente una chiara stagionalità il SES non può produrre una buona predizione. In ogni caso il modello è stato applicato sulla serie resa stazionaria facendo variare il valore dell'Iper-Parametro Alpha (lo Smoothing Level) nel range [0,1]. I risultati non variano molto, in generale la predizione graficamente risulta essere una semplice retta parallela, molto vicina alla media storica della TS. Infatti i Coefficienti di Determinazione sono vicini a 0 per ogni tentativo (un valore di R2 pari a 0 indica che il modello ha una Performance esattamente pari alla media). \newline
 
-\noindent \textbf{Holt's Linear Trend method}: 
+\noindent \textbf{Holt's Linear Trend method}:
 
 \begin{wrapfigure}[6]{r}{0.5\textwidth}
-\includegraphics[width=9cm]{forecast/Holt Forecast.png}
+\includegraphics[width=9cm]{forecast/Linear Holt.png}
 \end{wrapfigure}
 
-\noindent Anche questo metodo non produce buone predizioni su dati con stagionalità ma permette Forecast su dati con trend, quindi è stato testato sulla Time Series originale non stazionaria. Con valori degli Iper-Parametri Smoothing Level = 0.01 e Smoothing Slope = 0.1 riesce a catturare l'inversione di trend nella parte finale della TS. Il coefficiente R2 è comunque ancora vicino a 0. \newline
+\noindent Anche questo metodo non produce buone predizioni su dati con stagionalità ma permette Forecast su dati con trend, quindi è stato testato sulla Time Series originale non stazionaria. Con valori degli Iper-Parametri Smoothing Level = 0.01 e Smoothing Slope = 0.1 riesce a catturare l'inversione di trend nella parte finale della TS. Il coefficiente R2 è pari a 0.2786 ed il Mean Absolute Percentage Error (MAPE) è 0.0339. \newline
 
 
-\noindent \textbf{Exponential Smoothing}: Data l'accentuata stagionalità nei dati, con periodi giornalieri, è stato prodotto un modello basato su 1440 periodi (1 giorno in minuti), in modo da catturare il pattern tipico della temperatura giornaliera. I risultati dell'Exponential Smoothing stagionale sono i migliori tra i modelli testati (molto probabilmente il modello SARIMAX avrebbe prodotto risultati altrettanto soddisfacenti ma il test di un modello SARIMAX(4, 0, 1, 1440) risulta computazionalmente troppo complesso).
+\noindent \textbf{Holt Winter’s Exponential Smoothing}: Data l'accentuata stagionalità nei dati, con periodi giornalieri, è stato prodotto un modello basato su 1440 periodi (1 giorno in minuti), in modo da catturare il pattern tipico della temperatura giornaliera. I risultati dell'HWES sono i migliori tra i modelli testati sia sulla serie stazionaria che non (riportiamo quì quelli sulla serie originale, perché l'HWES è un modello che da solo riesce a catturare Trend e Seasonality).
 
 \begin{tabular}{ m{3.5cm} m{0cm} }
 
 \begin{tabular}{ | m{1.7cm} | m{1.2cm} | } 
 \hline
-R2 & 0.7698 \\
+R2 & 0.8012 \\
 \hline
-MAPE & 1.24 \\
+MAPE & 0.02 \\
 \hline
-MAXAPE & 62.82 \\
+MAXAPE & 0.047 \\
 \hline
-TAPE & 2130.31 \\
+TAPE & 28.88 \\
 \hline
-RMSE & 0.013 \\
+RMSE & 0.477 \\
 \hline
-MAE & 0.0101 \\
+MAE & 0.407 \\
 \hline
-MAD & 0.0078 \\
-\hline
-\end{tabular}
-
-&
-
-\begin{figure}[H]
-\includegraphics[width=13.5cm]{forecast/Exponential Smoothing Forecast.png}
-\end{figure}
-\end{tabular}
-
-
-\noindent \textbf{ARIMA}: Come suggerito dal grafico della PACF il miglior modello ARIMA per i dati ha Autoregressione di ordine 4 e Media Mobile di ordine 1: ARIMA(4, 0, 1). Nonostante il modello ARIMA funzioni solo su serie stazionarie e non predica la stagionalità, esso restituisce risultati apprezzabili sulla serie originale (va tenuto presente che anche la serie originale è abbastanza stazionaria). In particolare il modello predice dove si sposterà la media della serie e con che velocità lo farà.
-
-\begin{tabular}{ m{5cm} m{0cm} }
-
-\begin{tabular}{ | m{1.7cm} | m{1.2cm} | } 
-\hline
-R2 & 0.3479 \\
-\hline
-MAE & 0.608 \\
-\hline
-MAD & 0.548 \\
+MAD & 0.375 \\
 \hline
 \end{tabular}
 
 &
 
 \begin{figure}[H]
-\includegraphics[width=11cm]{forecast/ARIMA Forecast.png}
+\includegraphics[width=13.5cm]{forecast/Exponential Smoothing.png}
+\end{figure}
+\end{tabular}
+
+
+\noindent \textbf{ARIMA}: Come suggerito dal grafico della PACF il miglior modello ARIMA per i dati ha Autoregressione di ordine 4 e Media Mobile di ordine 1: ARIMA(4, 0, 1). Il modello ARIMA funziona solo su serie stazionarie (su cui appunto è stato testato) e non predice la stagionalità. In ogni caso esso predice discretamente l'inversione della temperatura dall'ora più calda dell'ultima giornata (le 10:00) in poi. In particolare il modello predice dove si sposterà la media della serie e con che velocità lo farà.
+
+\begin{tabular}{ m{4cm} m{0cm} }
+
+\begin{tabular}{ | m{1.7cm} | m{1.5cm} | } 
+\hline
+R2 & 0.5144 \\
+\hline
+MAPE & 35.814 \\
+\hline
+MAXAPE & 5569.45 \\
+\hline
+TAPE & 30083.50 \\
+\hline
+\end{tabular}
+
+&
+
+\begin{figure}[H]
+\includegraphics[width=13cm]{forecast/ARIMA.png}
 \end{figure}
 
 \end{tabular}
 
-\noindent 
+
+\noindent \textbf{SARIMAX}: il SARIMAX non riesce a fare forecast sulle Time Series usate fin'ora perché implica una computazione troppo dispendiosa. Quindi invece di usare la Time Series con la frequenza originale (minuti) si è selezionato una frequenza di ore. Per ovviare alla presenza di poche istanze temporali si è unito non solo il primo Test Set prima del Training ma anche il secondo Test Set dopo il Training (sempre per rispettare le precedenze temporali), interpolandone i valori mancanti come fatto nel primo caso. Alla nuova Time Series è stato rimosso il Trend sottraendo a ciascun valore la media mobile a 5 periodi. Il Dickey-Fuller Test ne ha confermato la stazionarietà. E' stato usato un  modello SARIMAX(4, 0, 1, 24), riprendendo cioè gli stessi Iper-Parametri del modello ARIMA e aggiungendovi una Seasonality di 24 periodi (dato che la frequenza adesso è di 1 ora la stagionalità giornalierà della temperatura si ripete ogni 24 ore). Riportiamo quì i risultati del test del modello sugli ultimi tre giorni esatti della time series.
+
+
+\begin{tabular}{ m{4cm} m{0cm} }
+
+\begin{tabular}{ | m{1.7cm} | m{1.5cm} | } 
+\hline
+R2 & 0.3692 \\
+\hline
+MAPE & 4.338 \\
+\hline
+MAXAPE & 73.911 \\
+\hline
+TAPE & 321.009 \\
+\hline
+RMSE & 0.3528 \\
+\hline
+\end{tabular}
+
+&
+
+\begin{figure}[H]
+\includegraphics[width=12cm]{forecast/SARIMAX.png}
+\end{figure}
+
+\end{tabular}
 
 
 
@@ -955,7 +984,7 @@ Structure (Feature) Based LR & 0.98 & 0.98 & 0.97 \\
 
 \section{Task 5 - Outlier Detection and Explainability}
 
-Sono stati uniti i due datset di test al training set per generare un DataFrame più grande su cui trovare gli Outliers. Il Test Set 1 è stato posto prima del Training Set ed il Test Set 2 è stato posto dopo, per rispettare le precedenze temporali. Il nuovo dataset è costituito da 20560 oggetti.
+Sono stati uniti i due datset di test al training set per generare un DataFrame più grande su cui trovare gli Outliers. Il nuovo dataset è costituito da 20560 oggetti.
 \\
 
 \noindent \textbf{BoxPlot}: I BoxPlot degli attributi 'Light' e 'CO2' sono già stati rappresentati nella fase iniziale di Data Understanding. Per l'attributo 'Light' il 99-esimo percentile è il valore 744. Cioè l'1\% delle istanze del dataset, che corrispondono a 205 oggetti, ha un valore dell'attributo 'Light' superiore a 744 (questi sono l'1\% degli Outliers). Non esistono invece Outliers per i valori bassi dell'attributo perché il valore più basso, che è 0, costituisce da solo il 62\% dei valori dell'attributo. 
