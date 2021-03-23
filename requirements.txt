@@ -1,5 +1,5 @@
 # This file may be used to create an environment using:
-# $ conda create --name <env> --file <this file>
+# $ conda create --name <environment name> --file <this file path and name>
 # platform: win-64
 _ipyw_jlab_nb_ext_conf=0.1.0=py37_0
 absl-py=0.9.0=py37hc8dfbb8_1
